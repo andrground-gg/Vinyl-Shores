@@ -11,6 +11,8 @@
 5.  World --- 5
 6.  Media List --- 6
 7.  Technical specification (if applicable) --- 7
+8.  Team
+9.  Deadlines and meetings
 
 # 1. Game Overview
 
@@ -197,3 +199,14 @@ and scoring details will be settled during prototyping.
 4. Vadim Andreev
 5. Shalin Rahel
 6. Rodrigo Rojas
+
+# 9. Deadlines and meetings
+
+- **16 October 2026:** The team met at the Leonardo campus around 17:00 and discussed the overall game concept.
+- **26 October 2026:** World and character drafts were in progress; Oriol and Andres planned the story.
+- **27 October 2026:** The story draft and world design were shared for feedback.
+- **28 October 2026:** The GDD was created and the initial character draft was shared.
+- **29 October 2026:** The team reviewed a consolidated GDD, including rhythm mechanics and the star system, and discussed starting encounters with E.
+- **30 October 2026:** The team discussed the narrative and a possible first-area MVP.
+
+Future deadlines and task owners are to be agreed by the team.
