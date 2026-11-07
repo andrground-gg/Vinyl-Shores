@@ -12,6 +12,9 @@ namespace VinylShores.Dialogue
     {
         public string speaker;
 
+        [Tooltip("Optional portrait shown next to this line.")]
+        public Sprite portrait;
+
         [TextArea(2, 6)]
         public string text;
     }

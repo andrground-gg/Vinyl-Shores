@@ -15,6 +15,7 @@ namespace VinylShores.Dialogue
         private const string SpeakerName = "SpeakerText";
         private const string BodyName = "BodyText";
         private const string HintName = "HintText";
+        private const string PortraitName = "Portrait";
         private const string PromptName = "DialoguePrompt";
         private const string PromptTextName = "PromptText";
 
@@ -22,6 +23,7 @@ namespace VinylShores.Dialogue
 
         [Header("Generated UI References")]
         [SerializeField] private GameObject panel;
+        [SerializeField] private Image portraitImage;
         [SerializeField] private Text speakerText;
         [SerializeField] private Text bodyText;
         [SerializeField] private Text hintText;
@@ -90,6 +92,11 @@ namespace VinylShores.Dialogue
                 speakerText = FindText(panel.transform, SpeakerName);
             }
 
+            if (portraitImage == null)
+            {
+                portraitImage = FindImage(panel.transform, PortraitName);
+            }
+
             if (bodyText == null)
             {
                 bodyText = FindText(panel.transform, BodyName);
@@ -112,7 +119,7 @@ namespace VinylShores.Dialogue
 
             if (promptText != null)
             {
-                promptText.text = "E per parlar";
+                promptText.text = "Press E to talk";
             }
 
             if (!IsOpen && panel != null)
@@ -192,6 +199,12 @@ namespace VinylShores.Dialogue
             currentIndex = 0;
             openedFrame = -1;
 
+            if (portraitImage != null)
+            {
+                portraitImage.sprite = null;
+                portraitImage.enabled = false;
+            }
+
             if (panel != null)
             {
                 panel.SetActive(false);
@@ -224,6 +237,13 @@ namespace VinylShores.Dialogue
         {
             DialogueLine line = currentLines[currentIndex];
 
+            if (portraitImage != null)
+            {
+                Sprite portrait = line != null ? line.portrait : null;
+                portraitImage.sprite = portrait;
+                portraitImage.enabled = portrait != null;
+            }
+
             if (speakerText != null)
             {
                 speakerText.text = line != null ? line.speaker : string.Empty;
@@ -236,7 +256,7 @@ namespace VinylShores.Dialogue
 
             if (hintText != null)
             {
-                hintText.text = currentIndex == currentLines.Length - 1 ? "[E] Tancar" : "[E] Continuar";
+                hintText.text = currentIndex == currentLines.Length - 1 ? "[E] Close" : "[E] Continue";
             }
         }
 
@@ -267,6 +287,16 @@ namespace VinylShores.Dialogue
             panelImage.color = new Color(0.03f, 0.04f, 0.06f, 0.92f);
             panelImage.raycastTarget = false;
 
+            Image portrait = CreateImage(panelObject.transform, PortraitName);
+            RectTransform portraitRect = portrait.rectTransform;
+            portraitRect.anchorMin = new Vector2(0f, 1f);
+            portraitRect.anchorMax = new Vector2(0f, 1f);
+            portraitRect.pivot = new Vector2(0f, 1f);
+            portraitRect.anchoredPosition = new Vector2(20f, -20f);
+            portraitRect.sizeDelta = new Vector2(120f, 120f);
+            portrait.preserveAspect = true;
+            portrait.enabled = false;
+
             Text speaker = CreateText(panelObject.transform, SpeakerName, 24, TextAnchor.UpperLeft);
             speaker.fontStyle = FontStyle.Bold;
             speaker.color = new Color(0.98f, 0.83f, 0.45f, 1f);
@@ -274,14 +304,14 @@ namespace VinylShores.Dialogue
             speakerRect.anchorMin = new Vector2(0f, 1f);
             speakerRect.anchorMax = new Vector2(1f, 1f);
             speakerRect.pivot = new Vector2(0.5f, 1f);
-            speakerRect.offsetMin = new Vector2(24f, -50f);
+            speakerRect.offsetMin = new Vector2(160f, -50f);
             speakerRect.offsetMax = new Vector2(-24f, -18f);
 
             Text body = CreateText(panelObject.transform, BodyName, 22, TextAnchor.UpperLeft);
             RectTransform bodyRect = body.rectTransform;
             bodyRect.anchorMin = new Vector2(0f, 0f);
             bodyRect.anchorMax = new Vector2(1f, 1f);
-            bodyRect.offsetMin = new Vector2(24f, 48f);
+            bodyRect.offsetMin = new Vector2(160f, 48f);
             bodyRect.offsetMax = new Vector2(-24f, -64f);
 
             Text hint = CreateText(panelObject.transform, HintName, 18, TextAnchor.LowerCenter);
@@ -324,7 +354,7 @@ namespace VinylShores.Dialogue
             promptImage.raycastTarget = false;
 
             Text text = CreateText(promptObject.transform, PromptTextName, 20, TextAnchor.MiddleCenter);
-            text.text = "E per parlar";
+            text.text = "Press E to talk";
             RectTransform textRect = text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
@@ -338,6 +368,27 @@ namespace VinylShores.Dialogue
         {
             Transform child = parent.Find(childName);
             return child != null ? child.GetComponent<Text>() : null;
+        }
+
+        private static Image FindImage(Transform parent, string childName)
+        {
+            Transform child = parent.Find(childName);
+            return child != null ? child.GetComponent<Image>() : null;
+        }
+
+        private static Image CreateImage(Transform parent, string name)
+        {
+            GameObject imageObject = new GameObject(
+                name,
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image));
+            imageObject.layer = UiLayer;
+            imageObject.transform.SetParent(parent, false);
+
+            Image image = imageObject.GetComponent<Image>();
+            image.raycastTarget = false;
+            return image;
         }
 
         private static Text CreateText(Transform parent, string name, int fontSize, TextAnchor alignment)

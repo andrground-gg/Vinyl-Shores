@@ -16,7 +16,14 @@ namespace VinylShores.Dialogue
         [SerializeField, Min(0f)] private float moveSpeed = 5f;
 
         private InputAction moveAction;
+        private Rigidbody2D body;
+        private Vector2 moveInput;
         private bool movementEnabled = true;
+
+        private void Awake()
+        {
+            body = GetComponent<Rigidbody2D>();
+        }
 
         private void OnEnable()
         {
@@ -52,6 +59,7 @@ namespace VinylShores.Dialogue
         {
             if (!movementEnabled || moveAction == null)
             {
+                moveInput = Vector2.zero;
                 return;
             }
 
@@ -61,12 +69,38 @@ namespace VinylShores.Dialogue
                 input.Normalize();
             }
 
-            transform.position += (Vector3)(input * (moveSpeed * Time.deltaTime));
+            moveInput = input;
+
+            // Fallback for scenes without a Rigidbody2D, such as older test
+            // scenes that still move the Transform directly.
+            if (body == null)
+            {
+                transform.position += (Vector3)(moveInput * (moveSpeed * Time.deltaTime));
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if (!movementEnabled || body == null)
+            {
+                return;
+            }
+
+            body.MovePosition(body.position + moveInput * (moveSpeed * Time.fixedDeltaTime));
         }
 
         public void SetMovementEnabled(bool enabled)
         {
             movementEnabled = enabled;
+
+            if (!enabled)
+            {
+                moveInput = Vector2.zero;
+                if (body != null)
+                {
+                    body.linearVelocity = Vector2.zero;
+                }
+            }
         }
     }
 }

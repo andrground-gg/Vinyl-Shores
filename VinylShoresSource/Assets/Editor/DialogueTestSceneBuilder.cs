@@ -17,10 +17,22 @@ namespace VinylShores.EditorTools
     {
         private const string ScenePath = "Assets/Scenes/DialogueTest.unity";
         private const string PlaceholderFolder = "Assets/Art/Placeholders";
-        private const string PlayerSpritePath = PlaceholderFolder + "/PlayerPlaceholder.png";
-        private const string NpcSpritePath = PlaceholderFolder + "/NpcPlaceholder.png";
+        private const string PlayerPlaceholderPath = PlaceholderFolder + "/PlayerPlaceholder.png";
+        private const string NpcPlaceholderPath = PlaceholderFolder + "/NpcPlaceholder.png";
+
+        private const string PlayerSpritePath =
+            "Assets/Sprites/NinjaAdventure/Actor/Character/Boy/SpriteSheet.png";
+        private const string NpcSpritePath =
+            "Assets/Sprites/NinjaAdventure/Actor/Character/OldMan/SpriteSheet.png";
+        private const string NpcPortraitPath =
+            "Assets/Sprites/NinjaAdventure/Actor/Character/OldMan/Faceset.png";
+
+        private const string PlayerSpriteFrame = "SpriteSheet_0";
+        private const string NpcSpriteFrame = "SpriteSheet_0";
+        private const string NpcPortraitFrame = "Faceset_0";
 
         private const string PanelObjectName = "DialoguePanel";
+        private const string PortraitObjectName = "Portrait";
         private const string SpeakerObjectName = "SpeakerText";
         private const string BodyObjectName = "BodyText";
         private const string HintObjectName = "HintText";
@@ -42,11 +54,12 @@ namespace VinylShores.EditorTools
 
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath) != null)
             {
-                bool overwrite = EditorUtility.DisplayDialog(
-                    "Dialogue Test Scene",
-                    ScenePath + " already exists. Overwrite it?",
-                    "Overwrite",
-                    "Cancel");
+                bool overwrite = Application.isBatchMode ||
+                    EditorUtility.DisplayDialog(
+                        "Dialogue Test Scene",
+                        ScenePath + " already exists. Overwrite it?",
+                        "Overwrite",
+                        "Cancel");
 
                 if (!overwrite)
                 {
@@ -57,19 +70,35 @@ namespace VinylShores.EditorTools
             EnsureFolder("Assets/Art");
             EnsureFolder(PlaceholderFolder);
 
-            Sprite playerSprite = GetOrCreatePlaceholderSprite(
-                PlayerSpritePath,
-                new Color(0.20f, 0.55f, 1.00f, 1f),
-                new Color(0.06f, 0.18f, 0.42f, 1f));
+            Sprite playerSprite = LoadSpriteFrame(PlayerSpritePath, PlayerSpriteFrame);
+            if (playerSprite == null)
+            {
+                Debug.LogWarning("Player sprite not found. Using the placeholder sprite.");
+                playerSprite = GetOrCreatePlaceholderSprite(
+                    PlayerPlaceholderPath,
+                    new Color(0.20f, 0.55f, 1.00f, 1f),
+                    new Color(0.06f, 0.18f, 0.42f, 1f));
+            }
 
-            Sprite npcSprite = GetOrCreatePlaceholderSprite(
-                NpcSpritePath,
-                new Color(0.95f, 0.55f, 0.20f, 1f),
-                new Color(0.38f, 0.18f, 0.05f, 1f));
+            Sprite npcSprite = LoadSpriteFrame(NpcSpritePath, NpcSpriteFrame);
+            if (npcSprite == null)
+            {
+                Debug.LogWarning("NPC sprite not found. Using the placeholder sprite.");
+                npcSprite = GetOrCreatePlaceholderSprite(
+                    NpcPlaceholderPath,
+                    new Color(0.95f, 0.55f, 0.20f, 1f),
+                    new Color(0.38f, 0.18f, 0.05f, 1f));
+            }
+
+            Sprite npcPortrait = LoadSpriteFrame(NpcPortraitPath, NpcPortraitFrame);
+            if (npcPortrait == null)
+            {
+                Debug.LogWarning("NPC portrait not found. The dialogue will show no portrait.");
+            }
 
             if (playerSprite == null || npcSprite == null)
             {
-                Debug.LogError("Could not create the placeholder sprites. Scene generation aborted.");
+                Debug.LogError("Could not create the character sprites. Scene generation aborted.");
                 return;
             }
 
@@ -82,7 +111,7 @@ namespace VinylShores.EditorTools
             DialogueUI dialogueUI;
             CreateDialogueCanvas(out dialogueUI);
 
-            GameObject npc = CreateNpc(npcSprite, player.transform, dialogueUI);
+            GameObject npc = CreateNpc(npcSprite, npcPortrait, player.transform, dialogueUI);
 
             EditorSceneManager.MarkSceneDirty(scene);
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
@@ -129,12 +158,44 @@ namespace VinylShores.EditorTools
             GameObject player = new GameObject("Player");
             player.transform.position = new Vector3(-3f, 0f, 0f);
 
-            SpriteRenderer renderer = player.AddComponent<SpriteRenderer>();
-            renderer.sprite = sprite;
-            renderer.sortingOrder = 1;
+            Rigidbody2D body = player.AddComponent<Rigidbody2D>();
+            body.bodyType = RigidbodyType2D.Dynamic;
+            body.gravityScale = 0f;
+            body.freezeRotation = true;
+            body.interpolation = RigidbodyInterpolation2D.Interpolate;
+            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            body.sleepMode = RigidbodySleepMode2D.NeverSleep;
 
+            CapsuleCollider2D collider = player.AddComponent<CapsuleCollider2D>();
+            collider.direction = CapsuleDirection2D.Vertical;
+            collider.size = new Vector2(0.5f, 0.5f);
+            collider.offset = new Vector2(0f, 0.25f);
+
+            CreateVisualChild(player, sprite, 2);
             player.AddComponent<DialogueTestPlayerMover>();
             return player;
+        }
+
+        private static GameObject CreateVisualChild(GameObject parent, Sprite sprite, int sortingOrder)
+        {
+            GameObject visual = new GameObject("Visual");
+            visual.transform.SetParent(parent.transform, false);
+
+            SpriteRenderer renderer = visual.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.sortingOrder = sortingOrder;
+
+            if (sprite != null && sprite.pixelsPerUnit > 0f && sprite.rect.height > 0f)
+            {
+                // The pack sprites are 16 px tall at 100 PPU. Scale them to
+                // roughly one world unit so they match the test scene layout.
+                float scale = 1f / (sprite.rect.height / sprite.pixelsPerUnit);
+                float width = sprite.rect.width / sprite.pixelsPerUnit * scale;
+                visual.transform.localScale = new Vector3(scale, scale, 1f);
+                visual.transform.localPosition = new Vector3(-width * 0.5f, 0f, 0f);
+            }
+
+            return visual;
         }
 
         private static GameObject CreateDialogueCanvas(out DialogueUI dialogueUI)
@@ -164,6 +225,7 @@ namespace VinylShores.EditorTools
             if (panel != null)
             {
                 SetObjectReference(serializedUI, "panel", panel.gameObject);
+                SetObjectReference(serializedUI, "portraitImage", FindImage(panel, PortraitObjectName));
                 SetObjectReference(serializedUI, "speakerText", FindText(panel, SpeakerObjectName));
                 SetObjectReference(serializedUI, "bodyText", FindText(panel, BodyObjectName));
                 SetObjectReference(serializedUI, "hintText", FindText(panel, HintObjectName));
@@ -188,14 +250,20 @@ namespace VinylShores.EditorTools
             return canvasObject;
         }
 
-        private static GameObject CreateNpc(Sprite sprite, Transform player, DialogueUI dialogueUI)
+        private static GameObject CreateNpc(
+            Sprite sprite,
+            Sprite portrait,
+            Transform player,
+            DialogueUI dialogueUI)
         {
             GameObject npc = new GameObject("NPC_OldSpin");
             npc.transform.position = new Vector3(2f, 0f, 0f);
 
-            SpriteRenderer renderer = npc.AddComponent<SpriteRenderer>();
-            renderer.sprite = sprite;
-            renderer.sortingOrder = 1;
+            BoxCollider2D collider = npc.AddComponent<BoxCollider2D>();
+            collider.size = new Vector2(0.6f, 0.9f);
+            collider.offset = new Vector2(0f, 0.45f);
+
+            CreateVisualChild(npc, sprite, 1);
 
             DialogueInteractable interactable = npc.AddComponent<DialogueInteractable>();
 
@@ -206,18 +274,79 @@ namespace VinylShores.EditorTools
 
             SerializedProperty lines = serializedNpc.FindProperty("lines");
             lines.arraySize = 3;
-            SetLine(lines.GetArrayElementAtIndex(0), "Old Spin", "The sea keeps its own tempo, kid.");
-            SetLine(lines.GetArrayElementAtIndex(1), "Old Spin", "Find the record by the dock, and we'll see if you can keep up.");
-            SetLine(lines.GetArrayElementAtIndex(2), "Old Spin", "Come back when you're ready.");
+            SetLine(lines.GetArrayElementAtIndex(0), "Old Spin", "The sea keeps its own tempo, kid.", portrait);
+            SetLine(
+                lines.GetArrayElementAtIndex(1),
+                "Old Spin",
+                "Find the record by the dock, and we'll see if you can keep up.",
+                portrait);
+            SetLine(lines.GetArrayElementAtIndex(2), "Old Spin", "Come back when you're ready.", portrait);
 
             serializedNpc.ApplyModifiedPropertiesWithoutUndo();
             return npc;
         }
 
-        private static void SetLine(SerializedProperty line, string speaker, string text)
+        private static void SetLine(SerializedProperty line, string speaker, string text, Sprite portrait)
         {
             line.FindPropertyRelative("speaker").stringValue = speaker;
+            line.FindPropertyRelative("portrait").objectReferenceValue = portrait;
             line.FindPropertyRelative("text").stringValue = text;
+        }
+
+        private static Sprite LoadSpriteFrame(string path, string frameName)
+        {
+            if (AssetDatabase.LoadAssetAtPath<Texture2D>(path) == null)
+            {
+                return null;
+            }
+
+            ConfigurePixelArtTexture(path);
+
+            Object[] assets = AssetDatabase.LoadAllAssetsAtPath(path);
+            for (int i = 0; i < assets.Length; i++)
+            {
+                Sprite sprite = assets[i] as Sprite;
+                if (sprite != null && sprite.name == frameName)
+                {
+                    return sprite;
+                }
+            }
+
+            Debug.LogWarning("Sprite frame '" + frameName + "' was not found in " + path + ".");
+            return null;
+        }
+
+        private static void ConfigurePixelArtTexture(string path)
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null)
+            {
+                return;
+            }
+
+            bool changed = false;
+            if (importer.filterMode != FilterMode.Point)
+            {
+                importer.filterMode = FilterMode.Point;
+                changed = true;
+            }
+
+            if (importer.mipmapEnabled)
+            {
+                importer.mipmapEnabled = false;
+                changed = true;
+            }
+
+            if (importer.textureCompression != TextureImporterCompression.Uncompressed)
+            {
+                importer.textureCompression = TextureImporterCompression.Uncompressed;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                importer.SaveAndReimport();
+            }
         }
 
         private static Text FindText(Transform parent, string childName)
@@ -226,7 +355,13 @@ namespace VinylShores.EditorTools
             return child != null ? child.GetComponent<Text>() : null;
         }
 
-        private static void SetObjectReference(SerializedObject serializedObject, string propertyName, UnityEngine.Object value)
+        private static Image FindImage(Transform parent, string childName)
+        {
+            Transform child = parent.Find(childName);
+            return child != null ? child.GetComponent<Image>() : null;
+        }
+
+        private static void SetObjectReference(SerializedObject serializedObject, string propertyName, Object value)
         {
             SerializedProperty property = serializedObject.FindProperty(propertyName);
             if (property == null)
