@@ -30,14 +30,14 @@ public class PlayerMovement : MonoBehaviour
     private int lastHorizontal; // -1 = left, +1 = right (last pressed)
     private int lastVertical;   // -1 = down, +1 = up (last pressed)
 
-    /// <summary>Last non-zero direction. Useful later for interacting with NPCs in front of the player.</summary>
+    // Last non-zero direction. Useful later for interacting with NPCs in front of the player.
     public Vector2 Facing => facing;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // Top-down setup: enforced in code so teammates can't break it in the Inspector by accident.
+        // Top-down setup: enforced in code so it can't be broken in the Inspector by accident.
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
@@ -65,8 +65,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Setting velocity every physics step: stops instantly on release, never drifts,
-        // and the physics engine blocks movement into colliders.
+        /* Setting velocity every physics step: stops instantly on release, never drifts,
+        and the physics engine blocks movement into colliders.*/
         rb.linearVelocity = moveDirection * moveSpeed;
     }
 
