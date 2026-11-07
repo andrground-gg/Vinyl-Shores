@@ -63,6 +63,23 @@ The prefabs are intentionally unwired:
 This keeps the NPC prefab drop-in for any scene that contains a player
 controller and a `DialogueCanvas`.
 
+## Multiple NPCs
+
+Several NPCs can share one `DialogueUI`:
+
+- Every in-range NPC requests the prompt through
+  `DialogueUI.SetPromptRequest`. The prompt stays visible while at least one
+  NPC requests it, and hides only when the last requester leaves.
+- Pressing `Interact` opens the dialogue of the nearest in-range NPC.
+  Distances are compared in world units; exact ties are broken by instance ID
+  so only one NPC handles the press.
+- Only the NPC that opened the dialogue advances it and raises
+  `onDialogueFinished`.
+- NPCs that are out of range, inactive or disabled do not block the nearest
+  active NPC.
+- `DialogueTest.unity` contains two NPCs (`NPC_OldSpin` and
+  `NPC_DockWorker`) to exercise this behavior.
+
 ## Movement lock
 
 The dialogue blocks movement through `IPlayerMovementLock`:
@@ -150,7 +167,13 @@ whether to start the challenge.
 - `Player` with `Rigidbody2D`, `CapsuleCollider2D` and
   `DialogueTestPlayerMover`.
 - `NPC_OldSpin` instantiated from `DialogueNpc.prefab` at `(2, 0)`.
+- `NPC_DockWorker` instantiated from `DialogueNpc.prefab` at `(4, 0)`, with
+  its own lines and no portrait.
 - `DialogueCanvas` instantiated from `DialogueCanvas.prefab`.
+
+Each NPC also has a `DialogueTestEventLogger` that logs when its
+`onDialogueFinished` event fires. This helper is for the test scene only and
+can be removed once the integration tests exist.
 
 The scene is not added to `EditorBuildSettings` on purpose. `SampleScene`,
 tilemaps, rhythm code and `InputSystem_Actions.inputactions` remain untouched.

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +35,10 @@ namespace VinylShores.Dialogue
         private int currentIndex;
         private int openedFrame = -1;
 
+        private readonly HashSet<DialogueInteractable> promptRequesters =
+            new HashSet<DialogueInteractable>();
+        private bool promptVisible;
+
         /// <summary>True while a dialogue is being displayed.</summary>
         public bool IsOpen { get; private set; }
 
@@ -52,6 +57,17 @@ namespace VinylShores.Dialogue
         private void Awake()
         {
             BuildUIIfNeeded();
+        }
+
+        private void OnDisable()
+        {
+            promptRequesters.Clear();
+            promptVisible = false;
+
+            if (promptRoot != null)
+            {
+                promptRoot.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -127,6 +143,7 @@ namespace VinylShores.Dialogue
                 panel.SetActive(false);
             }
 
+            promptVisible = false;
             if (promptRoot != null)
             {
                 promptRoot.SetActive(false);
@@ -154,10 +171,7 @@ namespace VinylShores.Dialogue
                 panel.SetActive(true);
             }
 
-            if (promptRoot != null)
-            {
-                promptRoot.SetActive(false);
-            }
+            RefreshPrompt();
 
             RenderCurrentLine();
         }
@@ -210,6 +224,8 @@ namespace VinylShores.Dialogue
                 panel.SetActive(false);
             }
 
+            RefreshPrompt();
+
             Action handler = Closed;
             if (handler != null)
             {
@@ -217,20 +233,52 @@ namespace VinylShores.Dialogue
             }
         }
 
-        /// <summary>Shows or hides the "press E" prompt.</summary>
-        public void ShowPrompt(bool visible)
+        /// <summary>
+        /// Registers or clears an NPC's request to show the interaction prompt.
+        /// The prompt stays visible while at least one NPC requests it and no
+        /// dialogue is open.
+        /// </summary>
+        public void SetPromptRequest(DialogueInteractable requester, bool wantsPrompt)
         {
+            if (requester == null)
+            {
+                return;
+            }
+
+            if (wantsPrompt)
+            {
+                promptRequesters.Add(requester);
+            }
+            else
+            {
+                promptRequesters.Remove(requester);
+            }
+
             if (promptRoot == null)
             {
                 BuildUIIfNeeded();
             }
 
+            RefreshPrompt();
+        }
+
+        private void RefreshPrompt()
+        {
             if (promptRoot == null)
             {
                 return;
             }
 
-            promptRoot.SetActive(visible && !IsOpen);
+            promptRequesters.RemoveWhere(requester => requester == null);
+
+            bool shouldShow = !IsOpen && promptRequesters.Count > 0;
+            if (shouldShow == promptVisible)
+            {
+                return;
+            }
+
+            promptVisible = shouldShow;
+            promptRoot.SetActive(shouldShow);
         }
 
         private void RenderCurrentLine()

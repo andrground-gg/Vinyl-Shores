@@ -33,7 +33,6 @@ namespace VinylShores.Dialogue
         private IPlayerMovementLock movementLock;
         private DialogueUI subscribedUI;
         private int nextReferenceResolveFrame;
-        private bool promptVisible;
         private bool dialogueOwner;
 
         private void Awake()
@@ -107,11 +106,9 @@ namespace VinylShores.Dialogue
                 SetMovementLocked(false);
             }
 
-            promptVisible = false;
-
             if (ui != null)
             {
-                ui.ShowPrompt(false);
+                ui.SetPromptRequest(this, false);
             }
         }
 
@@ -129,14 +126,7 @@ namespace VinylShores.Dialogue
                 return;
             }
 
-            bool shouldShowPrompt = !ui.IsOpen && IsPlayerInRange();
-            if (shouldShowPrompt == promptVisible)
-            {
-                return;
-            }
-
-            promptVisible = shouldShowPrompt;
-            ui.ShowPrompt(shouldShowPrompt);
+            ui.SetPromptRequest(this, IsPlayerInRange());
         }
 
         private void HandleInteractStarted(InputAction.CallbackContext context)
@@ -162,6 +152,11 @@ namespace VinylShores.Dialogue
 
             if (ui.IsOpen)
             {
+                if (!dialogueOwner)
+                {
+                    return;
+                }
+
                 lastHandledFrame = Time.frameCount;
                 if (!ui.OpenedThisFrame)
                 {
@@ -171,7 +166,7 @@ namespace VinylShores.Dialogue
                 return;
             }
 
-            if (!IsPlayerInRange())
+            if (!IsPlayerInRange() || !IsNearestInRange())
             {
                 return;
             }
@@ -195,8 +190,7 @@ namespace VinylShores.Dialogue
             SetMovementLocked(true);
 
             dialogueOwner = true;
-            promptVisible = false;
-            ui.ShowPrompt(false);
+            ui.SetPromptRequest(this, false);
             ui.Open(lines);
 
             if (!ui.IsOpen)
@@ -231,8 +225,53 @@ namespace VinylShores.Dialogue
             }
 
             float radius = Mathf.Max(0f, interactionRadius);
+            return DistanceSquaredToPlayer() <= radius * radius;
+        }
+
+        private float DistanceSquaredToPlayer()
+        {
+            if (player == null)
+            {
+                return float.PositiveInfinity;
+            }
+
             Vector2 delta = (Vector2)player.position - (Vector2)transform.position;
-            return delta.sqrMagnitude <= radius * radius;
+            return delta.sqrMagnitude;
+        }
+
+        /// <summary>
+        /// True when no other active NPC sharing the same player is closer to
+        /// it. Exact ties are broken by instance ID so only one NPC handles the
+        /// press.
+        /// </summary>
+        private bool IsNearestInRange()
+        {
+            float myDistance = DistanceSquaredToPlayer();
+            DialogueInteractable[] all = FindObjectsByType<DialogueInteractable>(
+                FindObjectsInactive.Exclude,
+                FindObjectsSortMode.None);
+
+            for (int i = 0; i < all.Length; i++)
+            {
+                DialogueInteractable other = all[i];
+                if (other == this ||
+                    !other.isActiveAndEnabled ||
+                    other.player != player ||
+                    !other.IsPlayerInRange())
+                {
+                    continue;
+                }
+
+                float otherDistance = other.DistanceSquaredToPlayer();
+                if (otherDistance < myDistance ||
+                    (Mathf.Approximately(otherDistance, myDistance) &&
+                     other.GetInstanceID() < GetInstanceID()))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
