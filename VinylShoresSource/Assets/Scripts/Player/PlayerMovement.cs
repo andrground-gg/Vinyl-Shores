@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 /*
 Four-direction (no diagonal) top-down movement
 Controls: WASD or arrow keys.
-If two axes are held at once, the most recently pressed axis wins.
+If several keys are held, the most recently pressed key wins.
 Collision is handled by the 2D physics engine (Dynamic Rigidbody2D + Collider2D)*/
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -27,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveDirection;
     private Vector2 facing = Vector2.down;
     private bool horizontalPressedLast;
+    private int lastHorizontal; // -1 = left, +1 = right (last pressed)
+    private int lastVertical;   // -1 = down, +1 = up (last pressed)
 
     /// <summary>Last non-zero direction. Useful later for interacting with NPCs in front of the player.</summary>
     public Vector2 Facing => facing;
@@ -76,9 +78,10 @@ public class PlayerMovement : MonoBehaviour
         UpdateAnimator();
     }
 
-    private static void ReadInput(out float x, out float y, out bool hJust, out bool vJust)
+    private void ReadInput(out float x, out float y, out bool hJust, out bool vJust)
     {
         bool left, right, up, down;
+        bool leftJust, rightJust, upJust, downJust;
 
 #if ENABLE_INPUT_SYSTEM
         Keyboard kb = Keyboard.current;
@@ -94,25 +97,42 @@ public class PlayerMovement : MonoBehaviour
         up    = kb.wKey.isPressed || kb.upArrowKey.isPressed;
         down  = kb.sKey.isPressed || kb.downArrowKey.isPressed;
 
-        hJust = kb.aKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame ||
-                kb.leftArrowKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame;
-        vJust = kb.wKey.wasPressedThisFrame || kb.sKey.wasPressedThisFrame ||
-                kb.upArrowKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame;
+        leftJust  = kb.aKey.wasPressedThisFrame || kb.leftArrowKey.wasPressedThisFrame;
+        rightJust = kb.dKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame;
+        upJust    = kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame;
+        downJust  = kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame;
 #else
         left  = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
         right = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
         up    = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
         down  = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
 
-        hJust = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) ||
-                Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
-        vJust = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S) ||
-                Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow);
+        leftJust  = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow);
+        rightJust = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow);
+        upJust    = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow);
+        downJust  = Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow);
 #endif
 
-        // Opposite keys cancel each other out.
-        x = (right ? 1f : 0f) - (left ? 1f : 0f);
-        y = (up ? 1f : 0f) - (down ? 1f : 0f);
+        // Remember the most recently pressed key on each axis.
+        if (leftJust)  lastHorizontal = -1;
+        if (rightJust) lastHorizontal = 1;
+        if (downJust)  lastVertical = -1;
+        if (upJust)    lastVertical = 1;
+
+        // Opposite keys held together: the most recently pressed one wins.
+        x = ResolveAxis(left, right, lastHorizontal);
+        y = ResolveAxis(down, up, lastVertical);
+
+        hJust = leftJust || rightJust;
+        vJust = upJust || downJust;
+    }
+
+    private static float ResolveAxis(bool negative, bool positive, int lastPressed)
+    {
+        if (negative && positive) return lastPressed;
+        if (positive) return 1f;
+        if (negative) return -1f;
+        return 0f;
     }
 
     private void UpdateAnimator()
