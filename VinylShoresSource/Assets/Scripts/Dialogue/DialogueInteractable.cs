@@ -31,21 +31,25 @@ namespace VinylShores.Dialogue
 
         private InputAction interactAction;
         private IPlayerMovementLock movementLock;
+        private DialogueUI subscribedUI;
+        private int nextReferenceResolveFrame;
         private bool promptVisible;
         private bool dialogueOwner;
 
         private void Awake()
         {
+            ResolveSceneReferences();
             CacheMovementLock();
         }
 
         private void OnEnable()
         {
+            ResolveSceneReferences();
             CacheMovementLock();
 
             if (ui != null)
             {
-                ui.Closed += HandleDialogueClosed;
+                SubscribeToUI();
             }
             else
             {
@@ -88,10 +92,7 @@ namespace VinylShores.Dialogue
                 interactAction = null;
             }
 
-            if (ui != null)
-            {
-                ui.Closed -= HandleDialogueClosed;
-            }
+            UnsubscribeFromUI();
 
             bool wasDialogueOwner = dialogueOwner;
             dialogueOwner = false;
@@ -116,6 +117,13 @@ namespace VinylShores.Dialogue
 
         private void Update()
         {
+            if ((ui == null || player == null) && Time.frameCount >= nextReferenceResolveFrame)
+            {
+                ResolveSceneReferences();
+                SubscribeToUI();
+                nextReferenceResolveFrame = Time.frameCount + 30;
+            }
+
             if (ui == null || player == null)
             {
                 return;
@@ -139,6 +147,12 @@ namespace VinylShores.Dialogue
             if (Time.frameCount == lastHandledFrame)
             {
                 return;
+            }
+
+            if (ui == null || player == null)
+            {
+                ResolveSceneReferences();
+                SubscribeToUI();
             }
 
             if (ui == null || player == null)
@@ -219,6 +233,64 @@ namespace VinylShores.Dialogue
             float radius = Mathf.Max(0f, interactionRadius);
             Vector2 delta = (Vector2)player.position - (Vector2)transform.position;
             return delta.sqrMagnitude <= radius * radius;
+        }
+
+        /// <summary>
+        /// Fills the player and UI references when a prefab instance was left
+        /// unwired. References assigned in the inspector always win.
+        /// </summary>
+        private void ResolveSceneReferences()
+        {
+            if (player == null)
+            {
+                player = FindPlayerTransform();
+            }
+
+            if (ui == null)
+            {
+                ui = FindFirstObjectByType<DialogueUI>(FindObjectsInactive.Include);
+            }
+        }
+
+        private static Transform FindPlayerTransform()
+        {
+            MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(
+                FindObjectsInactive.Exclude,
+                FindObjectsSortMode.None);
+
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                if (behaviours[i] is IPlayerMovementLock)
+                {
+                    return behaviours[i].transform;
+                }
+            }
+
+            GameObject taggedPlayer = GameObject.FindGameObjectWithTag("Player");
+            return taggedPlayer != null ? taggedPlayer.transform : null;
+        }
+
+        private void SubscribeToUI()
+        {
+            if (ui == null || subscribedUI == ui)
+            {
+                return;
+            }
+
+            UnsubscribeFromUI();
+            subscribedUI = ui;
+            ui.Closed += HandleDialogueClosed;
+        }
+
+        private void UnsubscribeFromUI()
+        {
+            if (subscribedUI == null)
+            {
+                return;
+            }
+
+            subscribedUI.Closed -= HandleDialogueClosed;
+            subscribedUI = null;
         }
 
         private void CacheMovementLock()
