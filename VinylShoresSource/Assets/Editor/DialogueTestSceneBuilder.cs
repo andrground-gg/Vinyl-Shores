@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using VinylShores.Core;
 using VinylShores.Dialogue;
 
 namespace VinylShores.EditorTools
@@ -150,6 +151,7 @@ namespace VinylShores.EditorTools
         private static GameObject CreatePlayer(Sprite sprite)
         {
             GameObject player = new GameObject("Player");
+            player.tag = "Player";
             player.transform.position = new Vector3(-3f, 0f, 0f);
 
             Rigidbody2D body = player.AddComponent<Rigidbody2D>();
@@ -166,7 +168,11 @@ namespace VinylShores.EditorTools
             collider.offset = new Vector2(0f, 0.25f);
 
             DialogueArtLibrary.CreateVisualChild(player, sprite, 2);
-            player.AddComponent<DialogueTestPlayerMover>();
+
+            // Shared controller from the movement prototype plus the adapter
+            // that lets dialogue pause it.
+            player.AddComponent<PlayerMovement>();
+            player.AddComponent<PlayerMovementLock>();
             return player;
         }
 
