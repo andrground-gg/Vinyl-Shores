@@ -6,9 +6,9 @@ should follow when they integrate the dialogue.
 
 ## Scope
 
-The prototype currently covers one repeatable NPC (`Old Spin`) in
-`Assets/Scenes/DialogueTest.unity`. It is a standalone test scene and is not
-part of the build settings yet.
+The prototype currently covers two repeatable NPCs (`Old Spin` and
+`Dock Worker`) in `Assets/Scenes/DialogueTest.unity`. It is a standalone test
+scene and is not part of the build settings yet.
 
 The rhythm challenge is **not implemented** in the repository. This document
 defines the hook and the expected contract so the rhythm work can plug in
@@ -22,7 +22,8 @@ without changing the dialogue code.
 | `Assets/Scripts/Dialogue/DialogueLine.cs` | Serialized line: speaker, optional portrait, text. |
 | `Assets/Scripts/Dialogue/DialogueUI.cs` | Screen-space dialogue UI, prompt, portrait and dialogue state. |
 | `Assets/Scripts/Dialogue/DialogueInteractable.cs` | Distance-based NPC interaction, movement lock and `onDialogueFinished`. |
-| `Assets/Scripts/Dialogue/DialogueTestPlayerMover.cs` | Temporary test mover; the real controller should replace it. |
+| `Assets/Scripts/Player/PlayerMovement.cs` | Shared four-direction controller from the movement prototype. |
+| `Assets/Scripts/Player/PlayerMovementLock.cs` | Adapter that implements `IPlayerMovementLock` by toggling `PlayerMovement`. |
 | `Assets/Prefabs/Dialogue/DialogueNpc.prefab` | Reusable NPC with collider, visuals and dialogue lines. |
 | `Assets/Prefabs/Dialogue/DialogueCanvas.prefab` | Reusable dialogue UI. |
 | `Assets/Editor/DialogueArtLibrary.cs` | Shared editor helpers for sprites, placeholders and serialized lines. |
@@ -91,11 +92,25 @@ public interface IPlayerMovementLock
 }
 ```
 
-The real player controller must implement this interface. `DialogueInteractable`
-caches the component from the player transform and calls
+`DialogueInteractable` caches the component from the player transform and calls
 `SetMovementEnabled(false)` when the dialogue opens and `true` when it closes.
 
-`DialogueTestPlayerMover` is a temporary implementation used by the test scene.
+The player uses the shared `PlayerMovement` controller from the movement
+prototype. `PlayerMovementLock` adapts it to the interface:
+
+- It disables `PlayerMovement` while a dialogue is open. `PlayerMovement`'s
+  `OnDisable` already zeroes its direction and velocity, so the body stops
+  immediately.
+- It re-enables the controller only if the lock was the one that disabled it,
+  so it never overrides another system that paused movement on purpose.
+- `PlayerMovement.cs` is not modified. Keeping the adapter separate avoids
+  conflicts with the movement branch and lets the controller change freely.
+
+## Branch integration
+
+`feature/npc-dialogue` is rebased on top of `feature/movement-prototype`, so it
+contains the shared controller and compiles on its own. `Assets/Scripts.meta`
+uses the movement branch GUID, so merging both branches does not conflict.
 
 ## `onDialogueFinished`
 
@@ -164,12 +179,15 @@ whether to start the challenge.
 
 - `Main Camera` (orthographic, size 5).
 - `Global Light 2D`.
-- `Player` with `Rigidbody2D`, `CapsuleCollider2D` and
-  `DialogueTestPlayerMover`.
+- `Player` with `Rigidbody2D`, `CapsuleCollider2D`, `PlayerMovement` and
+  `PlayerMovementLock`.
 - `NPC_OldSpin` instantiated from `DialogueNpc.prefab` at `(2, 0)`.
 - `NPC_DockWorker` instantiated from `DialogueNpc.prefab` at `(4, 0)`, with
   its own lines and no portrait.
 - `DialogueCanvas` instantiated from `DialogueCanvas.prefab`.
+
+Movement uses WASD or the arrow keys. `E` only interacts, so there is no input
+overlap between the controller and the dialogue.
 
 Each NPC also has a `DialogueTestEventLogger` that logs when its
 `onDialogueFinished` event fires. This helper is for the test scene only and
@@ -181,7 +199,9 @@ tilemaps, rhythm code and `InputSystem_Actions.inputactions` remain untouched.
 ## Current status
 
 - Dialogue, prompt, portrait and movement lock: implemented and manually tested.
-- `onDialogueFinished`: implemented, currently with no listeners.
+- Movement integration: uses the shared `PlayerMovement` controller through
+  `PlayerMovementLock`; the branch is rebased on `feature/movement-prototype`.
+- `onDialogueFinished`: implemented; the test scene wires it to a logger.
 - Dialogue prefabs: implemented.
 - Rhythm challenge: not implemented; waiting for the rhythm system.
 - Push, pull request and colleague test: pending.
