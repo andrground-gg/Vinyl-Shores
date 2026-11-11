@@ -221,9 +221,12 @@ be repeated. The four NPCs use solid **2D** colliders instead of the map draft's
 The unchanged movement controller runs at 4 units/second with four directions
 and last-pressed-key priority. Following visual review, Beach's player and all
 four NPCs are **one world unit tall**, with the Boy visual's aspect ratio
-preserved. Their centered **1 x 1** boxes block the complete character silhouette
-so the player cannot stand over an NPC's upper body. The player starts in the
-middle of the dock to keep its wider box clear of the water. The standalone
+preserved. NPCs sit at grid-cell centers with centered **1 x 1** boxes, so the
+player cannot stand over their bodies. The player's centered **0.85 x 0.85** box
+allows clearance through one-cell passages. The player starts at a dock cell's
+center. Environment collision is painted on the separate **Collision** tilemap
+in whole 1 x 1 cells; Water and Obstacles are visual layers without colliders.
+See [collision editing and validation](Beach_Integration_Review.md). The standalone
 movement prototype retains its original settings. The unfinished Animator is
 not assigned.
 
@@ -235,9 +238,10 @@ GUIDs remain as on main, preserving MovementTest and DialogueTest references.
 Do not move or reimport the shared character sheets to reproduce Beach's scale.
 
 The map retains its tiles, palette and Cinemachine **3.1.7** camera. Invisible
-2D colliders at the Ground tilemap's perimeter prevent walking off the map;
+blocked Collision tiles at the Ground tilemap's perimeter prevent walking off the map;
 they do not implement a progression gate. Project build settings are unchanged.
-Separate solid colliders cover the pot and tall sign on the south peninsula.
+The same Collision layer covers the pot and tall sign on the south peninsula,
+stumps, barrel and the other solid props; it does not use separate prop boxes.
 Three missing inner foam corners (the reported peninsula corner and two dock
 corners) use existing water tiles; shared tile assets/importers are unchanged.
 
