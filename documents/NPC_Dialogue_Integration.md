@@ -219,10 +219,13 @@ be repeated. The four NPCs use solid **2D** colliders instead of the map draft's
 3D colliders. A global 2D light makes the existing Sprite-Lit materials visible.
 
 The unchanged movement controller runs at 4 units/second with four directions
-and last-pressed-key priority. The player's root scale is one and its box is
-**0.6293 x 1.189** world units, matching the movement prototype's effective
-world-space box. Its separate Boy visual is 1.189 units tall, with its aspect
-ratio preserved. The unfinished Animator is not assigned.
+and last-pressed-key priority. Following visual review, Beach's player and all
+four NPCs are **one world unit tall**, with the Boy visual's aspect ratio
+preserved. Their centered **1 x 1** boxes block the complete character silhouette
+so the player cannot stand over an NPC's upper body. The player starts in the
+middle of the dock to keep its wider box clear of the water. The standalone
+movement prototype retains its original settings. The unfinished Animator is
+not assigned.
 
 Character textures used by Beach are isolated in `Assets/Sprites/BeachCharacters`:
 Boy, OldMan2, Knight, Village6 and Villager3. These are copies from Ninja Adventure,
@@ -234,6 +237,17 @@ Do not move or reimport the shared character sheets to reproduce Beach's scale.
 The map retains its tiles, palette and Cinemachine **3.1.7** camera. Invisible
 2D colliders at the Ground tilemap's perimeter prevent walking off the map;
 they do not implement a progression gate. Project build settings are unchanged.
+Separate solid colliders cover the pot and tall sign on the south peninsula.
+Three missing inner foam corners (the reported peninsula corner and two dock
+corners) use existing water tiles; shared tile assets/importers are unchanged.
+
+The pack already supplies `SeparateAnim/Idle.png` (four 16x16 frames) and
+`SeparateAnim/Walk.png` (sixteen 16x16 frames) for all five selected characters.
+The Idle strip contains directional standing poses, not a breathing loop.
+Player directional walking/idle and stationary NPC poses are tracked in
+[the animation task](https://trello.com/c/HTDv0uXE). They are not implemented in
+this scene yet. Attack/jump/death/special sheets are outside the game's current
+scope.
 
 ### Temporary limits
 

@@ -12,15 +12,20 @@ Validated locally on 11 November 2026 in **Unity 6000.3.12f1**.
 - Adds one existing DialogueCanvas prefab instance, explicitly wired dialogue
   components, and the existing PlayerMovementLock adapter.
 - Replaces the NPCs' nonfunctional 3D colliders with solid Collider2D components.
-- Preserves movement's 4 units/second, four directions, last-key priority and
-  effective player box of **0.6293 x 1.189** world units. Removes the unfinished
-  Animator assignment without editing PlayerMovement.
+- Preserves movement's 4 units/second, four directions and last-key priority.
+  After visual review, sets Beach's player and NPC visuals to one tile tall,
+  with centered **1 x 1** character colliders to prevent body overlap. Moves
+  the spawn to the dock's center. PlayerMovement and the standalone movement
+  prototype are unchanged; the unfinished Animator remains unassigned.
 - Uses five isolated copies of the pack character sheets with 16x16 slices,
   centered pivots and 16 PPU. Original shared character importers and GUIDs stay
   identical to main. Copies contain exactly the original PNG bytes.
 - Adds global 2D lighting for the existing Sprite-Lit materials and four solid
   perimeter walls. Retains the authored terrain, tile palette and Cinemachine
   3.1.7 camera.
+- Blocks the peninsula pot and the full height of its tall sign. Repairs the
+  missing inner foam corner at `(17, -14)` and matching dock corners at
+  `(-14, -14)` / `(-9, -14)` using existing water tiles.
 
 ## Local verification
 
@@ -42,6 +47,7 @@ from the game and its dependencies.
 | Solid collision | Player stopped against the young islander's Collider2D and the water at the dock's south edge |
 | Map perimeter | Four enabled non-trigger Collider2D walls verified by raycasts |
 | Scene physics | No remaining 3D colliders in Beach |
+| Visual-review regression | 24 checks passed: equal visual height, all four NPCs solid from all four sides, both peninsula props, and the reported foam corner |
 | Console | Zero errors/warnings after final gameplay checks in all three scenes |
 | Asset integrity | No missing asset/folder .meta files or duplicate asset GUIDs |
 
@@ -79,7 +85,13 @@ reimport/reslice shared character sheets to obtain Beach's scale.
 
 ![Beach overview](../Images/Screenshots/Beach_Integration/overview.png)
 
-The overview uses a temporary review camera to show the entire authored map;
-that camera is not saved in the scene. The image below is the actual Game View.
+The overview and close-up use temporary review cameras for readable framing;
+these cameras are not saved in the scene. Dialogue UI was verified separately
+in Play Mode.
 
-![Old Spin dialogue](../Images/Screenshots/Beach_Integration/old-spin-dialogue.png)
+![Corrected peninsula corner and blocked props](../Images/Screenshots/Beach_Integration/coast-refinement.png)
+
+Walking animations and directional standing poses already exist in the asset
+pack and are tracked in [Trello](https://trello.com/c/HTDv0uXE). The four Idle
+frames are facing directions, not a four-frame idle loop; NPC wandering is
+still excluded.
