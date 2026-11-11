@@ -226,8 +226,7 @@ player cannot stand over their bodies. The player's centered **0.85 x 0.85** box
 allows clearance through one-cell passages. The player starts at a dock cell's
 center. Environment collision is painted on the separate **Collision** tilemap
 in whole 1 x 1 cells; Water and Obstacles are visual layers without colliders.
-See [collision editing and validation](Beach_Integration_Review.md). The standalone
-movement prototype retains its original settings. The unfinished Animator is
+The standalone movement prototype retains its original settings. The unfinished Animator is
 not assigned.
 
 Character textures used by Beach are isolated in `Assets/Sprites/BeachCharacters`:
@@ -254,6 +253,20 @@ Player directional walking/idle and stationary NPC poses are tracked in
 [the animation task](https://trello.com/c/HTDv0uXE). They are not implemented in
 this scene yet. Attack/jump/death/special sheets are outside the game's current
 scope.
+
+### Editing Beach collision
+
+Paint blocked cells on `Grid/Collision` with
+`Assets/Tiles/Beach/Collision/Blocked.asset`; erase cells to make them walkable.
+The tile uses Collider Type: Grid and a static CompositeCollider2D. Keep Water
+and Obstacles free of colliders, and keep NPCs centered on cells.
+
+Collision's TilemapRenderer is disabled. Enable it temporarily to see the red
+overlay, then disable the renderer before saving; leave the GameObject and
+physics components enabled. Update Collision cells whenever solid art or the
+coast changes, including the blocked outer ring when expanding the map. The
+collision layer does not regenerate automatically. For tall props, block only
+their bases and keep the walkable upper parts on Above_Player.
 
 ### Temporary limits
 
