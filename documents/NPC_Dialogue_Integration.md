@@ -6,7 +6,7 @@ should follow when they integrate the dialogue.
 
 ## Scope
 
-The prototype currently covers two repeatable NPCs (`Old Spin` and
+The standalone prototype covers two repeatable NPCs (`Old Spin` and
 `Dock Worker`) in `Assets/Scenes/DialogueTest.unity`. It is a standalone test
 scene and is not part of the build settings yet.
 
@@ -196,6 +196,91 @@ can be removed once the integration tests exist.
 The scene is not added to `EditorBuildSettings` on purpose. `SampleScene`,
 tilemaps, rhythm code and `InputSystem_Actions.inputactions` remain untouched.
 
+## Beach integration
+
+Open `Assets/Scenes/Beach_Level/Beach.unity` in Unity **6000.3.12f1**.
+The scene has one player, one shared `DialogueCanvas`, and four stationary NPCs:
+
+| Scene object | Sprite variant | Role |
+| --- | --- | --- |
+| `Old-Spin` | `OldMan2` | Old Spin, the introductory guide. |
+| `Beach_Guardian` | `Village6` | Record guardian 1, the beach musician. |
+| `Kid2` | `Villager3` | Record guardian 2, a young islander. |
+| `Gate_Guardian` | `Knight` | Record guardian 3, located by the gate. |
+
+`Kid1` was removed. Existing names of the retained roots are preserved so map
+work can still identify the same objects. The knight is one of the three record
+guardians, not an additional gate-opening NPC.
+
+All four have an explicit reference to the scene player and shared `DialogueUI`.
+The player has `PlayerMovementLock` and the `Player` tag. Interact with E as in
+the prototype; closing a conversation restores movement, and conversations can
+be repeated. The four NPCs use solid **2D** colliders instead of the map draft's
+3D colliders. A global 2D light makes the existing Sprite-Lit materials visible.
+
+The unchanged movement controller runs at 4 units/second with four directions
+and last-pressed-key priority. Following visual review, Beach's player and all
+four NPCs are **one world unit tall**, with the Boy visual's aspect ratio
+preserved. NPCs sit at grid-cell centers with centered **1 x 1** boxes, so the
+player cannot stand over their bodies. The player's centered **0.85 x 0.85** box
+allows clearance through one-cell passages. The player starts at a dock cell's
+center. Environment collision is painted on the separate **Collision** tilemap
+in whole 1 x 1 cells; Water and Obstacles are visual layers without colliders.
+The standalone movement prototype retains its original settings. The unfinished Animator is
+not assigned.
+
+Character textures used by Beach are isolated in `Assets/Sprites/BeachCharacters`:
+Boy, OldMan2, Knight, Village6 and Villager3. These are copies from Ninja Adventure,
+not new external artwork. They use 16 PPU, 16x16 slices, centered pivots, Point
+filtering and no mipmaps/compression. Original shared character importers and
+GUIDs remain as on main, preserving MovementTest and DialogueTest references.
+Do not move or reimport the shared character sheets to reproduce Beach's scale.
+
+The map retains its tiles, palette and Cinemachine **3.1.7** camera. Invisible
+blocked Collision tiles at the Ground tilemap's perimeter prevent walking off the map;
+they do not implement a progression gate. Project build settings are unchanged.
+The same Collision layer covers the pot and tall sign on the south peninsula,
+stumps, barrel and the other solid props; it does not use separate prop boxes.
+Tall signs block only their base cells. Their upper cells are walkable and
+remain on Above_Player, which occludes the player behind them.
+Three missing inner foam corners (the reported peninsula corner and two dock
+corners) use existing water tiles; shared tile assets/importers are unchanged.
+
+The pack already supplies `SeparateAnim/Idle.png` (four 16x16 frames) and
+`SeparateAnim/Walk.png` (sixteen 16x16 frames) for all five selected characters.
+The Idle strip contains directional standing poses, not a breathing loop.
+Player directional walking/idle and stationary NPC poses are tracked in
+[the animation task](https://trello.com/c/HTDv0uXE). They are not implemented in
+this scene yet. Attack/jump/death/special sheets are outside the game's current
+scope.
+
+### Editing Beach collision
+
+Paint blocked cells on `Grid/Collision` with
+`Assets/Tiles/Beach/Collision/Blocked.asset`; erase cells to make them walkable.
+The tile uses Collider Type: Grid and a static CompositeCollider2D. Keep Water
+and Obstacles free of colliders, and keep NPCs centered on cells.
+
+Collision's TilemapRenderer is disabled. Enable it temporarily to see the red
+overlay, then disable the renderer before saving; leave the GameObject and
+physics components enabled. Update Collision cells whenever solid art or the
+coast changes, including the blocked outer ring when expanding the map. The
+collision layer does not regenerate automatically. For tall props, block only
+their bases and keep the walkable upper parts on Above_Player.
+
+### Temporary limits
+
+- Dialogue text is placeholder English text. Old Spin gives a static clue to
+  the first guardian northwest along the beach.
+- All guardians are available immediately. Dialogue completion awards no
+  record and does not start a fake challenge; `onDialogueFinished` has no
+  progression listener in Beach.
+- Rhythm challenges, record state, sequential hints, gate unlocking and pause
+  are separate integration work.
+- All NPCs remain stationary. GDD wandering for introductory NPCs is deferred.
+- Keep new map edits on a branch based on the merged integration; coordinate
+  changes to the shared Beach scene before merging concurrent scene edits.
+
 ## Current status
 
 - Dialogue, prompt, portrait and movement lock: implemented and manually tested.
@@ -204,4 +289,5 @@ tilemaps, rhythm code and `InputSystem_Actions.inputactions` remain untouched.
 - `onDialogueFinished`: implemented; the test scene wires it to a logger.
 - Dialogue prefabs: implemented.
 - Rhythm challenge: not implemented; waiting for the rhythm system.
-- Push, pull request and colleague test: pending.
+- The standalone movement and dialogue prototypes are merged into main (PRs
+  #1 and #2). Beach integration is reviewed and delivered separately.
