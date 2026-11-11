@@ -6,7 +6,7 @@ should follow when they integrate the dialogue.
 
 ## Scope
 
-The prototype currently covers two repeatable NPCs (`Old Spin` and
+The standalone prototype covers two repeatable NPCs (`Old Spin` and
 `Dock Worker`) in `Assets/Scenes/DialogueTest.unity`. It is a standalone test
 scene and is not part of the build settings yet.
 
@@ -196,6 +196,58 @@ can be removed once the integration tests exist.
 The scene is not added to `EditorBuildSettings` on purpose. `SampleScene`,
 tilemaps, rhythm code and `InputSystem_Actions.inputactions` remain untouched.
 
+## Beach integration
+
+Open `Assets/Scenes/Beach_Level/Beach.unity` in Unity **6000.3.12f1**.
+The scene has one player, one shared `DialogueCanvas`, and four stationary NPCs:
+
+| Scene object | Sprite variant | Role |
+| --- | --- | --- |
+| `Old-Spin` | `OldMan2` | Old Spin, the introductory guide. |
+| `Beach_Guardian` | `Village6` | Record guardian 1, the beach musician. |
+| `Kid2` | `Villager3` | Record guardian 2, a young islander. |
+| `Gate_Guardian` | `Knight` | Record guardian 3, located by the gate. |
+
+`Kid1` was removed. Existing names of the retained roots are preserved so map
+work can still identify the same objects. The knight is one of the three record
+guardians, not an additional gate-opening NPC.
+
+All four have an explicit reference to the scene player and shared `DialogueUI`.
+The player has `PlayerMovementLock` and the `Player` tag. Interact with E as in
+the prototype; closing a conversation restores movement, and conversations can
+be repeated. The four NPCs use solid **2D** colliders instead of the map draft's
+3D colliders. A global 2D light makes the existing Sprite-Lit materials visible.
+
+The unchanged movement controller runs at 4 units/second with four directions
+and last-pressed-key priority. The player's root scale is one and its box is
+**0.6293 x 1.189** world units, matching the movement prototype's effective
+world-space box. Its separate Boy visual is 1.189 units tall, with its aspect
+ratio preserved. The unfinished Animator is not assigned.
+
+Character textures used by Beach are isolated in `Assets/Sprites/BeachCharacters`:
+Boy, OldMan2, Knight, Village6 and Villager3. These are copies from Ninja Adventure,
+not new external artwork. They use 16 PPU, 16x16 slices, centered pivots, Point
+filtering and no mipmaps/compression. Original shared character importers and
+GUIDs remain as on main, preserving MovementTest and DialogueTest references.
+Do not move or reimport the shared character sheets to reproduce Beach's scale.
+
+The map retains its tiles, palette and Cinemachine **3.1.7** camera. Invisible
+2D colliders at the Ground tilemap's perimeter prevent walking off the map;
+they do not implement a progression gate. Project build settings are unchanged.
+
+### Temporary limits
+
+- Dialogue text is placeholder English text. Old Spin gives a static clue to
+  the first guardian northwest along the beach.
+- All guardians are available immediately. Dialogue completion awards no
+  record and does not start a fake challenge; `onDialogueFinished` has no
+  progression listener in Beach.
+- Rhythm challenges, record state, sequential hints, gate unlocking and pause
+  are separate integration work.
+- All NPCs remain stationary. GDD wandering for introductory NPCs is deferred.
+- Keep new map edits on a branch based on the merged integration; coordinate
+  changes to the shared Beach scene before merging concurrent scene edits.
+
 ## Current status
 
 - Dialogue, prompt, portrait and movement lock: implemented and manually tested.
@@ -204,4 +256,5 @@ tilemaps, rhythm code and `InputSystem_Actions.inputactions` remain untouched.
 - `onDialogueFinished`: implemented; the test scene wires it to a logger.
 - Dialogue prefabs: implemented.
 - Rhythm challenge: not implemented; waiting for the rhythm system.
-- Push, pull request and colleague test: pending.
+- The standalone movement and dialogue prototypes are merged into main (PRs
+  #1 and #2). Beach integration is reviewed and delivered separately.
