@@ -242,6 +242,8 @@ blocked Collision tiles at the Ground tilemap's perimeter prevent walking off th
 they do not implement a progression gate. Project build settings are unchanged.
 The same Collision layer covers the pot and tall sign on the south peninsula,
 stumps, barrel and the other solid props; it does not use separate prop boxes.
+Tall signs block only their base cells. Their upper cells are walkable and
+remain on Above_Player, which occludes the player behind them.
 Three missing inner foam corners (the reported peninsula corner and two dock
 corners) use existing water tiles; shared tile assets/importers are unchanged.
 

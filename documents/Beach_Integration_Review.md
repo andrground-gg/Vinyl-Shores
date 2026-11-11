@@ -29,7 +29,7 @@ Validated locally on 11 November 2026 in **Unity 6000.3.12f1**.
   perimeter boxes with one dedicated **Collision** tilemap on the existing
   **1 x 1 world-unit grid**. Its Grid-collider tiles block complete cells:
   coast/perimeter, rocks, walls, five stumps, barrel, bench, dock posts, pot and
-  both tall signs. Grass and flat decorative pebbles remain walkable.
+  the bases of both tall signs. Their upper cells remain walkable and render above the player. Grass and flat decorative pebbles remain walkable.
   NPCs are snapped to cell centers. Repairs the
   missing inner foam corner at `(17, -14)` and matching dock corners at
   `(-14, -14)` / `(-9, -14)` using existing water tiles.
@@ -51,7 +51,7 @@ from the game and its dependencies.
 | Multiple NPCs | Overlapping interaction ranges handled by one owner; closing press does not open another conversation |
 | Beach traversal | Walked from dock spawn to each of the four NPCs and back using real keyboard input; no stuck routes |
 | Route geometry | All four interaction areas reachable with the full player box plus clearance margin |
-| Grid collision audit | 641 blocked cells have live physics; 736 unblocked ground cells have player-sized environment clearance |
+| Grid collision audit | Initial grid revision: 641 blocked / 736 free cells validated. Tall-prop revision frees two overhead cells (639 blocked / 738 free); both bases remain solid |
 | Reported trouble spots | Walked the peninsula lane, cabin pole/stump gap and eastern rock gap; stumps/barrel stop the player |
 | Map perimeter | Blocked non-ground cells and an outer ring replace separate perimeter boxes |
 | Scene physics | No remaining 3D colliders in Beach |
@@ -121,3 +121,11 @@ Walking animations and directional standing poses already exist in the asset
 pack and are tracked in [Trello](https://trello.com/c/HTDv0uXE). The four Idle
 frames are facing directions, not a four-frame idle loop; NPC wandering is
 still excluded.
+
+## Tall-prop follow-up
+
+Freed overhead cells `(2, -7)` and `(16, -12)` while retaining their blocked bases. In Play Mode, real keyboard input entered both cells and movement into each base stopped. Both overhead tiles render at sorting order 10 above the player at 7. Camera captures visually confirmed occlusion for both props; Console had zero errors/warnings.
+
+![Behind peninsula sign](../Images/Screenshots/Beach_Integration/tall-sign-behind.png)
+
+![Behind cabin pole](../Images/Screenshots/Beach_Integration/tall-pole-behind.png)
