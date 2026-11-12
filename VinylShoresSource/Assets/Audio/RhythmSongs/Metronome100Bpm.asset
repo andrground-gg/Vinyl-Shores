@@ -13,406 +13,159 @@ MonoBehaviour:
   m_Name: Metronome100Bpm
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.RhythmSong
   track: {fileID: 8300000, guid: 28dc49b5a7d9cef4389744aec6022b95, type: 3}
+  trackTitle: Metronome - 100 BPM
+  location: 0
   bpm: 100
   firstBeatOffsetSeconds: 0
-  notes:
-  - beat: 0
-    lane: 0
-  - beat: 1
-    lane: 1
-  - beat: 2
-    lane: 0
-  - beat: 3
-    lane: 1
-  - beat: 4
-    lane: 0
-  - beat: 5
-    lane: 1
-  - beat: 6
-    lane: 0
-  - beat: 7
-    lane: 1
-  - beat: 8
-    lane: 0
-  - beat: 9
-    lane: 1
-  - beat: 10
-    lane: 0
-  - beat: 11
-    lane: 1
-  - beat: 12
-    lane: 0
-  - beat: 13
-    lane: 1
-  - beat: 14
-    lane: 0
-  - beat: 15
-    lane: 1
-  - beat: 16
-    lane: 0
-  - beat: 17
-    lane: 1
-  - beat: 18
-    lane: 0
-  - beat: 19
-    lane: 1
-  - beat: 20
-    lane: 0
-  - beat: 21
-    lane: 1
-  - beat: 22
-    lane: 0
-  - beat: 23
-    lane: 1
-  - beat: 24
-    lane: 0
-  - beat: 25
-    lane: 1
-  - beat: 26
-    lane: 0
-  - beat: 27
-    lane: 1
-  - beat: 28
-    lane: 0
-  - beat: 29
-    lane: 1
-  - beat: 30
-    lane: 0
-  - beat: 31
-    lane: 1
-  - beat: 32
-    lane: 0
-  - beat: 33
-    lane: 1
-  - beat: 34
-    lane: 0
-  - beat: 35
-    lane: 1
-  - beat: 36
-    lane: 0
-  - beat: 37
-    lane: 1
-  - beat: 38
-    lane: 0
-  - beat: 39
-    lane: 1
-  - beat: 40
-    lane: 0
-  - beat: 41
-    lane: 1
-  - beat: 42
-    lane: 0
-  - beat: 43
-    lane: 1
-  - beat: 44
-    lane: 0
-  - beat: 45
-    lane: 1
-  - beat: 46
-    lane: 0
-  - beat: 47
-    lane: 1
-  - beat: 48
-    lane: 0
-  - beat: 49
-    lane: 1
-  - beat: 50
-    lane: 0
-  - beat: 51
-    lane: 1
-  - beat: 52
-    lane: 0
-  - beat: 53
-    lane: 1
-  - beat: 54
-    lane: 0
-  - beat: 55
-    lane: 1
-  - beat: 56
-    lane: 0
-  - beat: 57
-    lane: 1
-  - beat: 58
-    lane: 0
-  - beat: 59
-    lane: 1
-  - beat: 60
-    lane: 0
-  - beat: 61
-    lane: 1
-  - beat: 62
-    lane: 0
-  - beat: 63
-    lane: 1
-  - beat: 64
-    lane: 0
-  - beat: 65
-    lane: 1
-  - beat: 66
-    lane: 0
-  - beat: 67
-    lane: 1
-  - beat: 68
-    lane: 0
-  - beat: 69
-    lane: 1
-  - beat: 70
-    lane: 0
-  - beat: 71
-    lane: 1
-  - beat: 72
-    lane: 0
-  - beat: 73
-    lane: 1
-  - beat: 74
-    lane: 0
-  - beat: 75
-    lane: 1
-  - beat: 76
-    lane: 0
-  - beat: 77
-    lane: 1
-  - beat: 78
-    lane: 0
-  - beat: 79
-    lane: 1
-  - beat: 80
-    lane: 0
-  - beat: 81
-    lane: 1
-  - beat: 82
-    lane: 0
-  - beat: 83
-    lane: 1
-  - beat: 84
-    lane: 0
-  - beat: 85
-    lane: 1
-  - beat: 86
-    lane: 0
-  - beat: 87
-    lane: 1
-  - beat: 88
-    lane: 0
-  - beat: 89
-    lane: 1
-  - beat: 90
-    lane: 0
-  - beat: 91
-    lane: 1
-  - beat: 92
-    lane: 0
-  - beat: 93
-    lane: 1
-  - beat: 94
-    lane: 0
-  - beat: 95
-    lane: 1
-  - beat: 96
-    lane: 0
-  - beat: 97
-    lane: 1
-  - beat: 98
-    lane: 0
-  - beat: 99
-    lane: 1
-  - beat: 100
-    lane: 0
-  - beat: 101
-    lane: 1
-  - beat: 102
-    lane: 0
-  - beat: 103
-    lane: 1
-  - beat: 104
-    lane: 0
-  - beat: 105
-    lane: 1
-  - beat: 106
-    lane: 0
-  - beat: 107
-    lane: 1
-  - beat: 108
-    lane: 0
-  - beat: 109
-    lane: 1
-  - beat: 110
-    lane: 0
-  - beat: 111
-    lane: 1
-  - beat: 112
-    lane: 0
-  - beat: 113
-    lane: 1
-  - beat: 114
-    lane: 0
-  - beat: 115
-    lane: 1
-  - beat: 116
-    lane: 0
-  - beat: 117
-    lane: 1
-  - beat: 118
-    lane: 0
-  - beat: 119
-    lane: 1
-  - beat: 120
-    lane: 0
-  - beat: 121
-    lane: 1
-  - beat: 122
-    lane: 0
-  - beat: 123
-    lane: 1
-  - beat: 124
-    lane: 0
-  - beat: 125
-    lane: 1
-  - beat: 126
-    lane: 0
-  - beat: 127
-    lane: 1
-  - beat: 128
-    lane: 0
-  - beat: 129
-    lane: 1
-  - beat: 130
-    lane: 0
-  - beat: 131
-    lane: 1
-  - beat: 132
-    lane: 0
-  - beat: 133
-    lane: 1
-  - beat: 134
-    lane: 0
-  - beat: 135
-    lane: 1
-  - beat: 136
-    lane: 0
-  - beat: 137
-    lane: 1
-  - beat: 138
-    lane: 0
-  - beat: 139
-    lane: 1
-  - beat: 140
-    lane: 0
-  - beat: 141
-    lane: 1
-  - beat: 142
-    lane: 0
-  - beat: 143
-    lane: 1
-  - beat: 144
-    lane: 0
-  - beat: 145
-    lane: 1
-  - beat: 146
-    lane: 0
-  - beat: 147
-    lane: 1
-  - beat: 148
-    lane: 0
-  - beat: 149
-    lane: 1
-  - beat: 150
-    lane: 0
-  - beat: 151
-    lane: 1
-  - beat: 152
-    lane: 0
-  - beat: 153
-    lane: 1
-  - beat: 154
-    lane: 0
-  - beat: 155
-    lane: 1
-  - beat: 156
-    lane: 0
-  - beat: 157
-    lane: 1
-  - beat: 158
-    lane: 0
-  - beat: 159
-    lane: 1
-  - beat: 160
-    lane: 0
-  - beat: 161
-    lane: 1
-  - beat: 162
-    lane: 0
-  - beat: 163
-    lane: 1
-  - beat: 164
-    lane: 0
-  - beat: 165
-    lane: 1
-  - beat: 166
-    lane: 0
-  - beat: 167
-    lane: 1
-  - beat: 168
-    lane: 0
-  - beat: 169
-    lane: 1
-  - beat: 170
-    lane: 0
-  - beat: 171
-    lane: 1
-  - beat: 172
-    lane: 0
-  - beat: 173
-    lane: 1
-  - beat: 174
-    lane: 0
-  - beat: 175
-    lane: 1
-  - beat: 176
-    lane: 0
-  - beat: 177
-    lane: 1
-  - beat: 178
-    lane: 0
-  - beat: 179
-    lane: 1
-  - beat: 180
-    lane: 0
-  - beat: 181
-    lane: 1
-  - beat: 182
-    lane: 0
-  - beat: 183
-    lane: 1
-  - beat: 184
-    lane: 0
-  - beat: 185
-    lane: 1
-  - beat: 186
-    lane: 0
-  - beat: 187
-    lane: 1
-  - beat: 188
-    lane: 0
-  - beat: 189
-    lane: 1
-  - beat: 190
-    lane: 0
-  - beat: 191
-    lane: 1
-  - beat: 192
-    lane: 0
-  - beat: 193
-    lane: 1
-  - beat: 194
-    lane: 0
-  - beat: 195
-    lane: 1
-  - beat: 196
-    lane: 0
-  - beat: 197
-    lane: 1
-  - beat: 198
-    lane: 0
-  - beat: 199
-    lane: 1
+  notes: []
+  patterns:
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 0
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 4
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 8
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 12
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 16
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 20
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 24
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 28
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: b19792d65ef311a409f5ca5fec343de6, type: 2}
+    startBeat: 32
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: b19792d65ef311a409f5ca5fec343de6, type: 2}
+    startBeat: 36
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 40
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 44
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: b19792d65ef311a409f5ca5fec343de6, type: 2}
+    startBeat: 48
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 52
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 56
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 60
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: aa44b41238cc07749adf8e574aaddcee, type: 2}
+    startBeat: 64
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 68
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: aa44b41238cc07749adf8e574aaddcee, type: 2}
+    startBeat: 72
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 76
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 282a6c90c3187b643ad051f92d9e61e7, type: 2}
+    startBeat: 80
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 84
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: b19792d65ef311a409f5ca5fec343de6, type: 2}
+    startBeat: 88
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 92
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 96
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 100
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 104
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 108
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 112
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 116
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: b19792d65ef311a409f5ca5fec343de6, type: 2}
+    startBeat: 120
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 124
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 94dabd55865fb1d4e913f6bb346844e4, type: 2}
+    startBeat: 128
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: aa44b41238cc07749adf8e574aaddcee, type: 2}
+    startBeat: 132
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 282a6c90c3187b643ad051f92d9e61e7, type: 2}
+    startBeat: 136
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: b19792d65ef311a409f5ca5fec343de6, type: 2}
+    startBeat: 140
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 94dabd55865fb1d4e913f6bb346844e4, type: 2}
+    startBeat: 144
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 148
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: aa44b41238cc07749adf8e574aaddcee, type: 2}
+    startBeat: 152
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 156
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 94dabd55865fb1d4e913f6bb346844e4, type: 2}
+    startBeat: 160
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 282a6c90c3187b643ad051f92d9e61e7, type: 2}
+    startBeat: 164
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: aa44b41238cc07749adf8e574aaddcee, type: 2}
+    startBeat: 168
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: b19792d65ef311a409f5ca5fec343de6, type: 2}
+    startBeat: 172
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 94dabd55865fb1d4e913f6bb346844e4, type: 2}
+    startBeat: 176
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: aa44b41238cc07749adf8e574aaddcee, type: 2}
+    startBeat: 180
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 5deb4f0242af70042ab0807caea42b6a, type: 2}
+    startBeat: 184
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 684e396f4fb87db4194852d0984dfd0f, type: 2}
+    startBeat: 188
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 7009f812effb3024bba553d60c1307e3, type: 2}
+    startBeat: 192
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 487e7c25216f89d4a843bd664ea86d6c, type: 2}
+    startBeat: 196
+    mirror: 0
