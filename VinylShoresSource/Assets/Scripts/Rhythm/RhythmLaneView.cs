@@ -15,6 +15,9 @@ namespace VinylShores.Rhythm
         [SerializeField] private float exitX = -500f;
 
         private readonly List<RectTransform> notes = new List<RectTransform>();
+        private UnityEngine.UI.Image targetImage;
+        private Color targetColor;
+        private double flashEndDsp;
         public int VisibleNoteCount { get; private set; }
         public int LaneIndex => laneIndex;
         public double HitX => noteContainer.InverseTransformPoint(hitTarget.position).x;
@@ -24,6 +27,8 @@ namespace VinylShores.Rhythm
         public void Initialize()
         {
             if (!IsConfigured) throw new InvalidOperationException("Rhythm lane references are missing.");
+            targetImage = hitTarget.GetComponent<UnityEngine.UI.Image>();
+            if (targetImage != null) targetColor = targetImage.color;
             noteTemplate.gameObject.SetActive(false);
             if (notes.Count > 0) return;
             for (int i = 0; i < 4; i++)
@@ -40,11 +45,14 @@ namespace VinylShores.Rhythm
             return HitX + (spawnX - HitX) * (noteTime - songTime) / leadSeconds;
         }
 
-        public void Render(double songTime, double secondsPerBeat, int totalNotes, double leadSeconds)
+        public void Render(double songTime, double secondsPerBeat, int totalNotes, double leadSeconds,
+            RhythmScoreSession session = null)
         {
+            if (targetImage != null && AudioSettings.dspTime >= flashEndDsp) targetImage.color = targetColor;
             int visible = 0;
             for (int beat = laneIndex; beat < totalNotes; beat += 2)
             {
+                if (session != null && session.IsResolved(beat)) continue;
                 double remaining = beat * secondsPerBeat - songTime;
                 if (remaining > leadSeconds) continue;
                 double x = GetNoteX(beat * secondsPerBeat, songTime, leadSeconds);
@@ -67,6 +75,14 @@ namespace VinylShores.Rhythm
         {
             foreach (var note in notes) if (note != null) note.gameObject.SetActive(false);
             VisibleNoteCount = 0;
+            if (targetImage != null) targetImage.color = targetColor;
+            flashEndDsp = 0;
+        }
+
+        public void Flash(Color color)
+        {
+            if (targetImage != null) targetImage.color = color;
+            flashEndDsp = AudioSettings.dspTime + 0.12;
         }
     }
 }

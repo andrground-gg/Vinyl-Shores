@@ -2,12 +2,13 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 namespace VinylShores.Rhythm
 {
     public enum RhythmPlaybackState { Ready, Loading, CountIn, Playing, Finished, Error }
 
-    /// <summary>Standalone DSP-scheduled metronome prototype. Does not score input or award records.</summary>
+    /// <summary>Standalone two-lane rhythm prototype with DSP timing. Does not award records.</summary>
     public sealed class RhythmPrototypeController : MonoBehaviour
     {
         [Header("Track")]
@@ -23,6 +24,11 @@ namespace VinylShores.Rhythm
         [Tooltip("Positive values make notes and count-in digits appear later. Does not change audio timing.")]
         [SerializeField, Range(-500, 500)] private float visualDelayMilliseconds;
 
+        [Header("Hit windows (milliseconds)")]
+        [SerializeField, Min(1)] private double perfectWindowMilliseconds = 50;
+        [SerializeField, Min(1)] private double goodWindowMilliseconds = 100;
+        [SerializeField, Min(1)] private double hitWindowMilliseconds = 150;
+
         [Header("Scene references")]
         [SerializeField] private RhythmLaneView[] lanes;
         [SerializeField] private GameObject readyPanel;
@@ -36,6 +42,9 @@ namespace VinylShores.Rhythm
         [SerializeField] private RectTransform progressFill;
         [SerializeField] private RectTransform progressTrack;
         [SerializeField] private TMP_Text calibrationText;
+        [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private TMP_Text comboText;
+        [SerializeField] private TMP_Text feedbackText;
 
         private double countStartDsp;
         private double musicStartDsp;
@@ -45,6 +54,10 @@ namespace VinylShores.Rhythm
         private const double PreparationSeconds = 0.2;
         private const string CalibrationPreference = "VinylShores.RhythmPrototype.VisualDelayMs";
         private float displayedDelay = float.NaN;
+        private InputAction leftAction;
+        private InputAction rightAction;
+        private double feedbackEndDsp;
+        public RhythmScoreSession Scoring { get; private set; }
 
         public RhythmPlaybackState State { get; private set; } = RhythmPlaybackState.Ready;
         public double SecondsPerBeat => 60.0 / bpm;
@@ -65,7 +78,10 @@ namespace VinylShores.Rhythm
                 bpm > 0 && beatsPerBar > 0 && bars > 0 && leadSeconds > 0 && lanes != null && lanes.Length == 2 &&
                 readyPanel != null && readyTitle != null && readyMessage != null && startButton != null &&
                 startButtonText != null && countText != null && elapsedText != null && durationText != null &&
-                progressFill != null && progressTrack != null && calibrationText != null;
+                progressFill != null && progressTrack != null && calibrationText != null &&
+                scoreText != null && comboText != null && feedbackText != null &&
+                perfectWindowMilliseconds > 0 && goodWindowMilliseconds >= perfectWindowMilliseconds &&
+                hitWindowMilliseconds >= goodWindowMilliseconds;
             if (configured)
             {
                 for (int i = 0; i < lanes.Length; i++)
@@ -88,8 +104,12 @@ namespace VinylShores.Rhythm
             }
             foreach (var lane in lanes) lane.Initialize();
             SetVisualDelay(PlayerPrefs.GetFloat(CalibrationPreference, visualDelayMilliseconds));
+            leftAction = new InputAction("RhythmLeft", InputActionType.Button, "<Keyboard>/leftArrow");
+            rightAction = new InputAction("RhythmRight", InputActionType.Button, "<Keyboard>/rightArrow");
+            leftAction.performed += OnLeftPressed;
+            rightAction.performed += OnRightPressed;
             startButton.onClick.AddListener(BeginPlayback);
-            ShowReady("Ready to find the beat?", "100 BPM / 2 lanes / visual timing test\nPress Space or Start. No hit scoring yet.", "Start");
+            ShowInitialReady();
             countText.text = "";
             UpdateProgress(0);
         }
@@ -99,6 +119,7 @@ namespace VinylShores.Rhythm
             if (!configured || !isActiveAndEnabled || State == RhythmPlaybackState.Loading ||
                 State == RhythmPlaybackState.CountIn || State == RhythmPlaybackState.Playing) return;
             StopPlayback();
+            ResetScoring();
             State = RhythmPlaybackState.Loading;
             readyPanel.SetActive(false);
             startButton.interactable = false;
@@ -149,21 +170,83 @@ namespace VinylShores.Rhythm
             if (now < countStartDsp) return;
             double audioTime = now - musicStartDsp;
             double time = audioTime - visualDelayMilliseconds / 1000.0;
+            Scoring.Advance(time);
             // Let both the scheduled audio and the delayed display finish before resetting.
             if (audioTime >= DurationSeconds && time >= DurationSeconds)
             {
                 StopPlayback();
                 State = RhythmPlaybackState.Finished;
                 UpdateProgress(DurationSeconds);
-                ShowReady("Playback finished", "Timing test complete.\nPress Space or Restart for another run.", "Restart");
+                ShowReady(Scoring.ScorePercentage >= 50 ? "Challenge passed" : "Try that beat again",
+                    $"{Scoring.ScorePercentage:F1}%  |  {Scoring.Score} / {Scoring.MaximumScore} points\n" +
+                    $"Perfect: {Scoring.Perfects}   Good: {Scoring.Goods}   OK: {Scoring.Oks}\n" +
+                    $"Miss: {Scoring.Misses}   Extra presses: {Scoring.ExtraPresses}\n" +
+                    $"Best combo: {Scoring.BestCombo}\n50% to pass. Prototype: no records awarded.", "Restart");
                 return;
             }
             State = audioTime < 0 ? RhythmPlaybackState.CountIn : RhythmPlaybackState.Playing;
             double countElapsed = time + CountInBeats * SecondsPerBeat;
             countText.text = countElapsed < 0 ? "Get ready" : time < 0 ?
                 (Math.Min(CountInBeats - 1, (int)(countElapsed / SecondsPerBeat)) + 1).ToString() : "";
-            foreach (var lane in lanes) lane.Render(time, SecondsPerBeat, TotalNotes, leadSeconds);
+            foreach (var lane in lanes) lane.Render(time, SecondsPerBeat, TotalNotes, leadSeconds, Scoring);
             UpdateProgress(Math.Max(0, time));
+            if (now >= feedbackEndDsp)
+            {
+                feedbackText.text = "LEFT / RIGHT to the beat";
+                feedbackText.color = new Color(1, 0.945f, 0.835f);
+            }
+        }
+
+        private void ResetScoring()
+        {
+            if (Scoring != null) Scoring.Judged -= OnJudged;
+            Scoring = new RhythmScoreSession(TotalNotes, SecondsPerBeat, perfectWindowMilliseconds / 1000,
+                goodWindowMilliseconds / 1000, hitWindowMilliseconds / 1000);
+            Scoring.Judged += OnJudged;
+            scoreText.text = "0.0%";
+            comboText.text = "0";
+            feedbackText.text = "LEFT / RIGHT to the beat";
+            feedbackText.color = new Color(1, 0.945f, 0.835f);
+            feedbackEndDsp = 0;
+        }
+
+        private void OnLeftPressed(InputAction.CallbackContext context) => JudgeInput(0, context.time);
+        private void OnRightPressed(InputAction.CallbackContext context) => JudgeInput(1, context.time);
+
+        private void JudgeInput(int lane, double inputEventTime)
+        {
+            if (!configured || (State != RhythmPlaybackState.CountIn && State != RhythmPlaybackState.Playing)) return;
+            // Input events carry timestamps; subtract their age instead of judging at this frame's arrival time.
+            double eventDspTime = AudioSettings.dspTime - (InputState.currentTime - inputEventTime);
+            double time = eventDspTime - musicStartDsp - visualDelayMilliseconds / 1000.0;
+            Scoring.Press(lane, time);
+        }
+
+        private void OnJudged(RhythmHitResult result)
+        {
+            bool missed = result.Rating == RhythmRating.Miss || result.Rating == RhythmRating.EmptyPress;
+            Color color = missed ? new Color(0.93f, 0.59f, 0.5f) : result.Rating == RhythmRating.Perfect ?
+                new Color(0.96f, 0.78f, 0.49f) : new Color(0.65f, 0.9f, 0.8f);
+            string label = result.Rating == RhythmRating.EmptyPress ? "EXTRA PRESS" : result.Rating.ToString().ToUpperInvariant();
+            if (!missed)
+            {
+                label += Math.Abs(result.ErrorSeconds) < 0.001 ? "  ON TIME" :
+                    $"  {(result.ErrorSeconds < 0 ? "EARLY" : "LATE")} {Math.Abs(result.ErrorSeconds) * 1000:F0} ms";
+            }
+            feedbackText.text = label;
+            feedbackText.color = color;
+            feedbackEndDsp = AudioSettings.dspTime + 0.7;
+            lanes[result.Lane].Flash(color);
+            scoreText.text = Scoring.ScorePercentage.ToString("F1") + "%";
+            comboText.text = Scoring.Combo.ToString();
+        }
+
+        private void ShowInitialReady()
+        {
+            ShowReady("Ready to find the beat?",
+                "LEFT / RIGHT: press when notes meet the marker.\n" +
+                $"Perfect {perfectWindowMilliseconds:0} ms / Good {goodWindowMilliseconds:0} ms / OK {hitWindowMilliseconds:0} ms\n" +
+                "Extra presses reset combo. Press Space or Start.", "Start");
         }
 
         public void SetVisualDelay(float milliseconds)
@@ -229,6 +312,8 @@ namespace VinylShores.Rhythm
 
         private void OnDisable()
         {
+            leftAction?.Disable();
+            rightAction?.Disable();
             StopPlayback();
             State = RhythmPlaybackState.Ready;
         }
@@ -236,13 +321,19 @@ namespace VinylShores.Rhythm
         private void OnEnable()
         {
             if (!configured) return;
-            ShowReady("Ready to find the beat?", "100 BPM / 2 lanes / visual timing test\nPress Space or Start. No hit scoring yet.", "Start");
+            leftAction.Enable();
+            rightAction.Enable();
+            ResetScoring();
+            ShowInitialReady();
             countText.text = "";
             UpdateProgress(0);
         }
 
         private void OnDestroy()
         {
+            leftAction?.Dispose();
+            rightAction?.Dispose();
+            if (Scoring != null) Scoring.Judged -= OnJudged;
             if (startButton != null) startButton.onClick.RemoveListener(BeginPlayback);
         }
     }
