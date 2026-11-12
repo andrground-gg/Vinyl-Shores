@@ -12,12 +12,9 @@ namespace VinylShores.Rhythm
     public sealed class RhythmPrototypeController : MonoBehaviour
     {
         [Header("Track")]
-        [SerializeField] private AudioClip track;
+        [SerializeField] private RhythmSong song;
         [SerializeField] private AudioSource countInSource;
         [SerializeField] private AudioSource musicSource;
-        [SerializeField, Min(1)] private double bpm = 100;
-        [SerializeField, Min(1)] private int beatsPerBar = 4;
-        [SerializeField, Min(1)] private int bars = 50;
         [SerializeField, Min(0.1f)] private double leadSeconds = 2.4;
 
         [Header("Local display calibration")]
@@ -57,25 +54,32 @@ namespace VinylShores.Rhythm
         private InputAction leftAction;
         private InputAction rightAction;
         private double feedbackEndDsp;
+        private RhythmChart chart;
+        private AudioClip countInSample;
+        private AudioClip countInClick;
+        private AudioSource[] countSources;
+        private double firstBeatDsp;
         public RhythmScoreSession Scoring { get; private set; }
+        public RhythmChart Chart => chart;
 
         public RhythmPlaybackState State { get; private set; } = RhythmPlaybackState.Ready;
-        public double SecondsPerBeat => 60.0 / bpm;
-        public int TotalNotes => beatsPerBar * bars;
+        public double SecondsPerBeat => chart != null ? chart.SecondsPerBeat : 0;
+        public int TotalNotes => chart != null ? chart.NoteCount : 0;
         public double SongTime => State == RhythmPlaybackState.Finished ? DurationSeconds :
             State == RhythmPlaybackState.CountIn || State == RhythmPlaybackState.Playing ?
             AudioSettings.dspTime - musicStartDsp : 0;
         public double MusicStartDsp => musicStartDsp;
         public double CountStartDsp => countStartDsp;
-        public double DurationSeconds => track != null ? (double)track.samples / track.frequency : 0;
+        public double FirstBeatDsp => firstBeatDsp;
+        public double DurationSeconds => chart != null ? chart.DurationSeconds : 0;
         public float VisualDelayMilliseconds => visualDelayMilliseconds;
         public double VisualSongTime => State == RhythmPlaybackState.CountIn || State == RhythmPlaybackState.Playing ?
             SongTime - visualDelayMilliseconds / 1000.0 : SongTime;
 
         private void Awake()
         {
-            configured = track != null && countInSource != null && musicSource != null && countInSource != musicSource &&
-                bpm > 0 && beatsPerBar > 0 && bars > 0 && leadSeconds > 0 && lanes != null && lanes.Length == 2 &&
+            configured = countInSource != null && countInSource.clip != null && musicSource != null && countInSource != musicSource &&
+                leadSeconds > 0 && lanes != null && lanes.Length == 2 &&
                 readyPanel != null && readyTitle != null && readyMessage != null && startButton != null &&
                 startButtonText != null && countText != null && elapsedText != null && durationText != null &&
                 progressFill != null && progressTrack != null && calibrationText != null &&
@@ -93,15 +97,19 @@ namespace VinylShores.Rhythm
                 enabled = false;
                 return;
             }
-            foreach (var source in new[] { countInSource, musicSource })
+            countInSample = countInSource.clip;
+            ConfigureSource(musicSource);
+            countSources = new AudioSource[CountInBeats];
+            countSources[0] = countInSource;
+            for (int i = 1; i < CountInBeats; i++)
             {
-                source.playOnAwake = false;
-                source.loop = false;
-                source.spatialBlend = 0;
-                source.pitch = 1;
-                source.clip = track;
-                source.Stop();
+                var beatObject = new GameObject("CountInBeat" + (i + 1));
+                beatObject.transform.SetParent(transform, false);
+                countSources[i] = beatObject.AddComponent<AudioSource>();
+                countSources[i].outputAudioMixerGroup = countInSource.outputAudioMixerGroup;
+                countSources[i].volume = countInSource.volume;
             }
+            foreach (var source in countSources) ConfigureSource(source);
             foreach (var lane in lanes) lane.Initialize();
             SetVisualDelay(PlayerPrefs.GetFloat(CalibrationPreference, visualDelayMilliseconds));
             leftAction = new InputAction("RhythmLeft", InputActionType.Button, "<Keyboard>/leftArrow");
@@ -109,9 +117,17 @@ namespace VinylShores.Rhythm
             leftAction.performed += OnLeftPressed;
             rightAction.performed += OnRightPressed;
             startButton.onClick.AddListener(BeginPlayback);
-            ShowInitialReady();
             countText.text = "";
             UpdateProgress(0);
+        }
+
+        private static void ConfigureSource(AudioSource source)
+        {
+            source.playOnAwake = false;
+            source.loop = false;
+            source.spatialBlend = 0;
+            source.pitch = 1;
+            source.Stop();
         }
 
         public void BeginPlayback()
@@ -119,28 +135,75 @@ namespace VinylShores.Rhythm
             if (!configured || !isActiveAndEnabled || State == RhythmPlaybackState.Loading ||
                 State == RhythmPlaybackState.CountIn || State == RhythmPlaybackState.Playing) return;
             StopPlayback();
-            ResetScoring();
+            if (!PrepareSong()) return;
             State = RhythmPlaybackState.Loading;
             readyPanel.SetActive(false);
             startButton.interactable = false;
             countText.text = "Loading audio...";
             UpdateProgress(0);
             loadStartedDsp = AudioSettings.dspTime;
-            if (track.loadState == AudioDataLoadState.Loaded) SchedulePlayback();
-            else if (track.loadState != AudioDataLoadState.Loading && !track.LoadAudioData()) FailLoading();
+            if (!RequestAudioData(chart.Track) || !RequestAudioData(countInSample)) FailLoading();
+            else if (AudioLoaded()) SchedulePlayback();
+        }
+
+        private bool PrepareSong()
+        {
+            if (song == null)
+            {
+                FailLoading("Assign a Rhythm Song asset on RhythmPlayback.");
+                return false;
+            }
+            if (!song.TryCreateChart(out var preparedChart, out string error))
+            {
+                FailLoading(error);
+                return false;
+            }
+            chart = preparedChart;
+            musicSource.clip = chart.Track;
+            ResetScoring();
+            return true;
+        }
+
+        private static bool RequestAudioData(AudioClip clip)
+        {
+            return clip.loadState == AudioDataLoadState.Loaded || clip.loadState == AudioDataLoadState.Loading || clip.LoadAudioData();
+        }
+
+        private bool AudioLoaded() => chart.Track.loadState == AudioDataLoadState.Loaded &&
+            countInSample.loadState == AudioDataLoadState.Loaded;
+
+        private bool PrepareCountInClick()
+        {
+            if (countInClick != null) return true;
+            // Reuse only the first metronome click; the original OGG is never edited.
+            int frames = Math.Min(countInSample.samples, Math.Max(1, (int)(countInSample.frequency * 0.12)));
+            var samples = new float[frames * countInSample.channels];
+            if (!countInSample.GetData(samples, 0)) return false;
+            countInClick = AudioClip.Create("Rhythm count-in click", frames, countInSample.channels, countInSample.frequency, false);
+            countInClick.SetData(samples, 0);
+            return true;
         }
 
         private void SchedulePlayback()
         {
-            if (DurationSeconds < TotalNotes * SecondsPerBeat - 0.01)
+            if (!PrepareCountInClick())
             {
-                FailLoading("Track is shorter than the configured beat grid.");
+                FailLoading("Could not read the count-in metronome. Its audio data must be decompressed on load.");
                 return;
             }
-            countStartDsp = AudioSettings.dspTime + PreparationSeconds;
-            musicStartDsp = countStartDsp + CountInBeats * SecondsPerBeat;
-            countInSource.PlayScheduled(countStartDsp);
-            countInSource.SetScheduledEndTime(musicStartDsp);
+            double countDuration = CountInBeats * SecondsPerBeat;
+            double firstNoteAfterBeatZero = chart.GetNote(0).TimeSeconds - chart.FirstBeatOffsetSeconds;
+            double preRoll = Math.Max(Math.Max(countDuration, chart.FirstBeatOffsetSeconds), leadSeconds - firstNoteAfterBeatZero);
+            firstBeatDsp = AudioSettings.dspTime + PreparationSeconds + preRoll + Math.Max(0, -visualDelayMilliseconds / 1000.0);
+            countStartDsp = firstBeatDsp - countDuration;
+            musicStartDsp = firstBeatDsp - chart.FirstBeatOffsetSeconds;
+            for (int i = 0; i < CountInBeats; i++)
+            {
+                double start = countStartDsp + i * SecondsPerBeat;
+                countSources[i].clip = countInClick;
+                countSources[i].PlayScheduled(start);
+                countSources[i].SetScheduledEndTime(start + Math.Min((double)countInClick.samples / countInClick.frequency, SecondsPerBeat));
+            }
             musicSource.PlayScheduled(musicStartDsp);
             musicSource.SetScheduledEndTime(musicStartDsp + DurationSeconds);
             State = RhythmPlaybackState.CountIn;
@@ -161,18 +224,18 @@ namespace VinylShores.Rhythm
             UpdateCalibrationText();
             if (State == RhythmPlaybackState.Loading)
             {
-                if (track.loadState == AudioDataLoadState.Loaded) SchedulePlayback();
-                else if (track.loadState == AudioDataLoadState.Failed || AudioSettings.dspTime - loadStartedDsp > 10) FailLoading();
+                if (AudioLoaded()) SchedulePlayback();
+                else if (chart.Track.loadState == AudioDataLoadState.Failed || countInSample.loadState == AudioDataLoadState.Failed ||
+                    AudioSettings.dspTime - loadStartedDsp > 10) FailLoading();
                 return;
             }
             if (State != RhythmPlaybackState.CountIn && State != RhythmPlaybackState.Playing) return;
             double now = AudioSettings.dspTime;
-            if (now < countStartDsp) return;
             double audioTime = now - musicStartDsp;
             double time = audioTime - visualDelayMilliseconds / 1000.0;
             Scoring.Advance(time);
             // Let both the scheduled audio and the delayed display finish before resetting.
-            if (audioTime >= DurationSeconds && time >= DurationSeconds)
+            if (audioTime >= DurationSeconds && time >= Math.Max(DurationSeconds, Scoring.LastHitWindowEnd + 0.000001))
             {
                 StopPlayback();
                 State = RhythmPlaybackState.Finished;
@@ -184,11 +247,12 @@ namespace VinylShores.Rhythm
                     $"Best combo: {Scoring.BestCombo}\n50% to pass. Prototype: no records awarded.", "Restart");
                 return;
             }
-            State = audioTime < 0 ? RhythmPlaybackState.CountIn : RhythmPlaybackState.Playing;
-            double countElapsed = time + CountInBeats * SecondsPerBeat;
-            countText.text = countElapsed < 0 ? "Get ready" : time < 0 ?
+            State = now < firstBeatDsp ? RhythmPlaybackState.CountIn : RhythmPlaybackState.Playing;
+            double timeFromFirstBeat = time - chart.FirstBeatOffsetSeconds;
+            double countElapsed = timeFromFirstBeat + CountInBeats * SecondsPerBeat;
+            countText.text = countElapsed < 0 ? "Get ready" : timeFromFirstBeat < 0 ?
                 (Math.Min(CountInBeats - 1, (int)(countElapsed / SecondsPerBeat)) + 1).ToString() : "";
-            foreach (var lane in lanes) lane.Render(time, SecondsPerBeat, TotalNotes, leadSeconds, Scoring);
+            foreach (var lane in lanes) lane.Render(time, chart, leadSeconds, Scoring);
             UpdateProgress(Math.Max(0, time));
             if (now >= feedbackEndDsp)
             {
@@ -200,7 +264,7 @@ namespace VinylShores.Rhythm
         private void ResetScoring()
         {
             if (Scoring != null) Scoring.Judged -= OnJudged;
-            Scoring = new RhythmScoreSession(TotalNotes, SecondsPerBeat, perfectWindowMilliseconds / 1000,
+            Scoring = new RhythmScoreSession(chart, perfectWindowMilliseconds / 1000,
                 goodWindowMilliseconds / 1000, hitWindowMilliseconds / 1000);
             Scoring.Judged += OnJudged;
             scoreText.text = "0.0%";
@@ -244,7 +308,7 @@ namespace VinylShores.Rhythm
         private void ShowInitialReady()
         {
             ShowReady("Ready to find the beat?",
-                "LEFT / RIGHT: press when notes meet the marker.\n" +
+                $"{chart.Bpm:0.##} BPM / {chart.NoteCount} notes\nLEFT / RIGHT: press when notes meet the marker.\n" +
                 $"Perfect {perfectWindowMilliseconds:0} ms / Good {goodWindowMilliseconds:0} ms / OK {hitWindowMilliseconds:0} ms\n" +
                 "Extra presses reset combo. Press Space or Start.", "Start");
         }
@@ -295,16 +359,16 @@ namespace VinylShores.Rhythm
             readyPanel.SetActive(true);
         }
 
-        private void FailLoading(string message = "Could not load the metronome. Please try again.")
+        private void FailLoading(string message = "Could not load the audio. Please try again.")
         {
             StopPlayback();
             State = RhythmPlaybackState.Error;
-            ShowReady("Audio unavailable", message, "Try again");
+            ShowReady("Song unavailable", message, "Try again");
         }
 
         private void StopPlayback()
         {
-            if (countInSource != null) countInSource.Stop();
+            if (countSources != null) foreach (var source in countSources) if (source != null) source.Stop();
             if (musicSource != null) musicSource.Stop();
             if (lanes != null) foreach (var lane in lanes) if (lane != null) lane.Clear();
             if (countText != null) countText.text = "";
@@ -323,8 +387,8 @@ namespace VinylShores.Rhythm
             if (!configured) return;
             leftAction.Enable();
             rightAction.Enable();
-            ResetScoring();
-            ShowInitialReady();
+            State = RhythmPlaybackState.Ready;
+            if (PrepareSong()) ShowInitialReady();
             countText.text = "";
             UpdateProgress(0);
         }
@@ -333,6 +397,7 @@ namespace VinylShores.Rhythm
         {
             leftAction?.Dispose();
             rightAction?.Dispose();
+            if (countInClick != null) Destroy(countInClick);
             if (Scoring != null) Scoring.Judged -= OnJudged;
             if (startButton != null) startButton.onClick.RemoveListener(BeginPlayback);
         }

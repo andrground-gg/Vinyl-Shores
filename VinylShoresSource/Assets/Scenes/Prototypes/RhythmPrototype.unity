@@ -8605,12 +8605,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5ecb737a567e344e99faf7f33d0c775, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.RhythmPrototypeController
-  track: {fileID: 8300000, guid: 28dc49b5a7d9cef4389744aec6022b95, type: 3}
+  song: {fileID: 11400000, guid: 122fb2701f1691f40a4cfca508565607, type: 2}
   countInSource: {fileID: 24030879}
   musicSource: {fileID: 1150491095}
-  bpm: 100
-  beatsPerBar: 4
-  bars: 50
   leadSeconds: 2.4
   visualDelayMilliseconds: 0
   perfectWindowMilliseconds: 50

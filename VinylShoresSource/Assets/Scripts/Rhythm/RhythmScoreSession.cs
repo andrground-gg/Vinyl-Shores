@@ -6,25 +6,25 @@ namespace VinylShores.Rhythm
 
     public readonly struct RhythmHitResult
     {
-        public int Beat { get; }
+        public int NoteIndex { get; }
         public int Lane { get; }
         public RhythmRating Rating { get; }
         public double ErrorSeconds { get; }
 
-        public RhythmHitResult(int beat, int lane, RhythmRating rating, double errorSeconds = 0)
+        public RhythmHitResult(int noteIndex, int lane, RhythmRating rating, double errorSeconds = 0)
         {
-            Beat = beat;
+            NoteIndex = noteIndex;
             Lane = lane;
             Rating = rating;
             ErrorSeconds = errorSeconds;
         }
     }
 
-    /// <summary>Judges a two-lane alternating chart using calibrated song timestamps, independently of frames.</summary>
+    /// <summary>Judges the song's explicit note list using calibrated timestamps, independently of frames.</summary>
     public sealed class RhythmScoreSession
     {
         private readonly RhythmRating[] ratings;
-        private readonly double secondsPerBeat;
+        private readonly RhythmChart chart;
         private readonly double perfectWindow;
         private readonly double goodWindow;
         private readonly double hitWindow;
@@ -44,32 +44,34 @@ namespace VinylShores.Rhythm
         public int Misses { get; private set; }
         public int ExtraPresses { get; private set; }
         public int ResolvedNotes { get; private set; }
+        public double LastHitWindowEnd => chart.GetNote(TotalNotes - 1).TimeSeconds + hitWindow;
 
-        public RhythmScoreSession(int totalNotes, double secondsPerBeat, double perfectWindow = 0.05,
+        public RhythmScoreSession(RhythmChart chart, double perfectWindow = 0.05,
             double goodWindow = 0.1, double hitWindow = 0.15)
         {
-            if (totalNotes <= 0 || totalNotes > int.MaxValue / 100 || !IsFinite(secondsPerBeat) || secondsPerBeat <= 0 ||
+            if (chart == null || chart.NoteCount <= 0 ||
                 !IsFinite(perfectWindow) || !IsFinite(goodWindow) || !IsFinite(hitWindow) ||
                 perfectWindow <= 0 || goodWindow < perfectWindow || hitWindow < goodWindow)
             {
-                throw new ArgumentOutOfRangeException(nameof(totalNotes), "Invalid chart or timing windows.");
+                throw new ArgumentOutOfRangeException(nameof(chart), "Invalid chart or timing windows.");
             }
-            ratings = new RhythmRating[totalNotes];
-            this.secondsPerBeat = secondsPerBeat;
+            ratings = new RhythmRating[chart.NoteCount];
+            this.chart = chart;
             this.perfectWindow = perfectWindow;
             this.goodWindow = goodWindow;
             this.hitWindow = hitWindow;
         }
 
-        public bool IsResolved(int beat) => ratings[beat] != RhythmRating.None;
+        public bool IsResolved(int noteIndex) => ratings[noteIndex] != RhythmRating.None;
 
         public void Advance(double songTime)
         {
             if (!IsFinite(songTime)) throw new ArgumentOutOfRangeException(nameof(songTime));
-            for (int beat = 0; beat < TotalNotes; beat++)
+            for (int i = 0; i < TotalNotes; i++)
             {
-                if (beat * secondsPerBeat + hitWindow + BoundaryTolerance >= songTime) break;
-                if (!IsResolved(beat)) Resolve(new RhythmHitResult(beat, beat % 2, RhythmRating.Miss));
+                var note = chart.GetNote(i);
+                if (note.TimeSeconds + hitWindow + BoundaryTolerance >= songTime) break;
+                if (!IsResolved(i)) Resolve(new RhythmHitResult(i, note.Lane, RhythmRating.Miss));
             }
         }
 
@@ -78,19 +80,20 @@ namespace VinylShores.Rhythm
             if (lane < 0 || lane > 1) throw new ArgumentOutOfRangeException(nameof(lane));
             if (!IsFinite(songTime)) throw new ArgumentOutOfRangeException(nameof(songTime));
             Advance(songTime);
-            if (songTime < -hitWindow - BoundaryTolerance ||
-                songTime > (TotalNotes - 1) * secondsPerBeat + hitWindow + BoundaryTolerance || ResolvedNotes == TotalNotes)
+            if (songTime < chart.GetNote(0).TimeSeconds - hitWindow - BoundaryTolerance ||
+                songTime > LastHitWindowEnd + BoundaryTolerance || ResolvedNotes == TotalNotes)
             {
                 return new RhythmHitResult(-1, lane, RhythmRating.None);
             }
             int closest = -1;
             double closestDistance = double.MaxValue;
-            for (int beat = lane; beat < TotalNotes; beat += 2)
+            for (int i = 0; i < TotalNotes; i++)
             {
-                double distance = Math.Abs(songTime - beat * secondsPerBeat);
-                if (!IsResolved(beat) && distance <= hitWindow + BoundaryTolerance && distance < closestDistance)
+                var note = chart.GetNote(i);
+                double distance = Math.Abs(songTime - note.TimeSeconds);
+                if (note.Lane == lane && !IsResolved(i) && distance <= hitWindow + BoundaryTolerance && distance < closestDistance)
                 {
-                    closest = beat;
+                    closest = i;
                     closestDistance = distance;
                 }
             }
@@ -104,14 +107,14 @@ namespace VinylShores.Rhythm
             }
             var rating = closestDistance <= perfectWindow + BoundaryTolerance ? RhythmRating.Perfect :
                 closestDistance <= goodWindow + BoundaryTolerance ? RhythmRating.Good : RhythmRating.Ok;
-            var result = new RhythmHitResult(closest, lane, rating, songTime - closest * secondsPerBeat);
+            var result = new RhythmHitResult(closest, lane, rating, songTime - chart.GetNote(closest).TimeSeconds);
             Resolve(result);
             return result;
         }
 
         private void Resolve(RhythmHitResult result)
         {
-            ratings[result.Beat] = result.Rating;
+            ratings[result.NoteIndex] = result.Rating;
             ResolvedNotes++;
             switch (result.Rating)
             {

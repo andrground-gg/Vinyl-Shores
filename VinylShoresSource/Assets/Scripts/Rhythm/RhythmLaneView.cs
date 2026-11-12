@@ -45,17 +45,18 @@ namespace VinylShores.Rhythm
             return HitX + (spawnX - HitX) * (noteTime - songTime) / leadSeconds;
         }
 
-        public void Render(double songTime, double secondsPerBeat, int totalNotes, double leadSeconds,
+        public void Render(double songTime, RhythmChart chart, double leadSeconds,
             RhythmScoreSession session = null)
         {
             if (targetImage != null && AudioSettings.dspTime >= flashEndDsp) targetImage.color = targetColor;
             int visible = 0;
-            for (int beat = laneIndex; beat < totalNotes; beat += 2)
+            for (int i = 0; i < chart.NoteCount; i++)
             {
-                if (session != null && session.IsResolved(beat)) continue;
-                double remaining = beat * secondsPerBeat - songTime;
+                var chartNote = chart.GetNote(i);
+                if (chartNote.Lane != laneIndex || (session != null && session.IsResolved(i))) continue;
+                double remaining = chartNote.TimeSeconds - songTime;
                 if (remaining > leadSeconds) continue;
-                double x = GetNoteX(beat * secondsPerBeat, songTime, leadSeconds);
+                double x = GetNoteX(chartNote.TimeSeconds, songTime, leadSeconds);
                 if (x < exitX) continue;
                 if (visible == notes.Count)
                 {
