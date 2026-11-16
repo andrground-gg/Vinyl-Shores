@@ -63,7 +63,7 @@ above replace them in Phase B.
   The player asks where each record was composed.
 - Hints use the real Beach landmarks:
   - Record 1: northwest, past the stumps, where the trees meet the sand.
-  - Record 2: east, past the cabin, to the barrel by the rocks.
+  - Record 2: east, past the cabin, to the open sand by the eastern rocks.
   - Record 3: north, through the trees, to the stone gate.
 - Ordinary dialogue never grants a record and never fakes a success. Success
   lines play only after a real rhythm success.
@@ -71,6 +71,20 @@ above replace them in Phase B.
 - The Knight is guardian 3. He guards the record, not the gate, and says so.
 - Guardian order and access rules belong to the progression integration. Until
   it exists, the guardians keep an honest "not connected" message.
+
+### Landmark reference
+
+Checked against the scene tilemaps:
+
+| Record | Landmark in the scene | Guardian |
+| --- | --- | --- |
+| 1 | Stumps on the northwest sand and the tree line at the top of the map | `Beach_Guardian` at `(-7.5, 6.5)` |
+| 2 | Eastern rock formation on the right edge, past the cabin | `Kid2` at `(15.5, 1.5)` |
+| 3 | Stone wall/gate with a gap in the northern tree line | `Gate_Guardian` at `(9.5, 8.5)` |
+
+The east route has no barrel. The barrels in the scene are by the cabin, in the
+northwest camp and near the north gate; the eastern landmark is the rock
+formation.
 
 ## Old Spin
 
@@ -108,16 +122,16 @@ selector, so repeating the interaction replays these lines.
 | --- | --- | --- |
 | 1 | Old Spin | That label... I know that label. You found it. |
 | 2 | Old Spin | Put it here, child. Let me hear it again. |
-| 3 | Old Spin | There's another. I wrote it on the east side, near the old barrel. |
+| 3 | Old Spin | There's another. I wrote it on the east side, out by the rocks. |
 | 4 | Old Spin | The young islander would know. They keep the songs of the shore. |
-| 5 | Old Spin | Go east, past the cabin. Look for the barrel by the rocks. |
+| 5 | Old Spin | Go east, past the cabin. Look for the open sand by the eastern rocks. |
 
 ### Repeat hint 2 (1 record)
 
 | # | Speaker | Line |
 | --- | --- | --- |
 | 1 | Old Spin | The next one was with the young islander. |
-| 2 | Old Spin | East, past the cabin, to the barrel by the rocks. |
+| 2 | Old Spin | East, past the cabin, to the open sand by the eastern rocks. |
 | 3 | Old Spin | They know the songs I wrote for the shore. |
 
 ### After record 2 (2 records)
@@ -147,7 +161,7 @@ selector, so repeating the interaction replays these lines.
 | 3 | Old Spin | But these three... these three are home. |
 | 4 | Boy | We make a good team. |
 | 5 | Old Spin | We do. And I still owe you a song, child. |
-| 6 | Old Spin | Rest first. Then we'll cross the gate and search for the rest of the album. |
+| 6 | Old Spin | Rest first. Then we'll cross the gate and see if the rest of the album is out there. |
 
 ### Beach complete, gate open (3 records, gate unlocked)
 
@@ -155,7 +169,7 @@ Same lines 1-5, with the last line replaced:
 
 | # | Speaker | Line |
 | --- | --- | --- |
-| 6 | Old Spin | The gate is open. Rest, then we'll find the rest of the album. |
+| 6 | Old Spin | The gate is open. Rest, then we'll see what else is out there. |
 
 ## Beach Guardian (record 1)
 
@@ -305,6 +319,32 @@ Problems with this text:
 - The speaker labels are placeholders, not character names.
 - Old Spin promises "musical challenges" as future content, which reads as a
   teaser rather than an honest placeholder.
+
+## Notes for reviewers
+
+Intentional deviations from the GDD and from a literal reading of the task:
+
+- **No upfront record count.** Old Spin does not say "three" in the
+  introduction. He discovers the number as records return. The word "Three"
+  appears only in the completion variant.
+- **Player speaker is `Boy`.** The GDD uses the working name "Digger" for the
+  protagonist; this script uses `Boy` per the task owner's decision.
+- **NPCs are stationary.** The GDD describes the introductory NPC wandering;
+  the task requires no NPC wandering, so every Beach NPC stays put.
+- **The Knight is a beach guardian.** The GDD lists a surfer, beach musician or
+  harbor captain as beach concepts; the task assigns `Gate_Guardian` as record
+  guardian 3. The script follows the task.
+- **Trade is composition help.** The GDD says the protagonist recovers the
+  records in exchange for the musician's guidance. The script states the trade
+  as help composing the protagonist's own album, which keeps the same exchange.
+- **No scene edits yet.** This document is the draft. The four
+  `DialogueInteractable` components still hold the old placeholders; Phase B
+  applies the text together with the progression state.
+
+Landmark and route checks were done against the scene tilemaps: all four NPCs
+are reachable from the player spawn on the `Collision` grid, and the three
+clues point at objects that exist on the map. The Play Mode walk is still
+pending.
 
 ## Phase B checklist
 
