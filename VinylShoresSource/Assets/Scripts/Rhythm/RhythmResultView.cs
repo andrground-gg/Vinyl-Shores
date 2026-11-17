@@ -33,8 +33,7 @@ namespace VinylShores.Rhythm
             Math.Round(percent, MidpointRounding.AwayFromZero), 0, 100);
         public static int StarsForPercentage(double percent)
         {
-            int rounded = RoundedPercentage(percent);
-            return rounded >= 90 ? 3 : rounded >= 70 ? 2 : rounded >= 50 ? 1 : 0;
+            return percent >= 90 ? 3 : percent >= 70 ? 2 : percent >= 50 ? 1 : 0;
         }
 
         public void ResetView()
@@ -62,7 +61,7 @@ namespace VinylShores.Rhythm
         {
             points = session.Score;
             maximum = session.MaximumScore;
-            percentage = RoundedPercentage(session.ScorePercentage);
+            percentage = session.ScorePercentage;
             EarnedStars = StarsForPercentage(percentage);
             startedDsp = AudioSettings.dspTime;
             animating = true;
@@ -97,7 +96,7 @@ namespace VinylShores.Rhythm
         {
             double elapsed = AudioSettings.dspTime - startedDsp;
             float p = Mathf.Clamp01((float)(elapsed / 1.2));
-            int shownPercentage = RoundedPercentage(percentage * p);
+            int shownPercentage = (int)Math.Floor(Math.Clamp(percentage * p, 0, 100));
             if (percentageText != null) percentageText.text = shownPercentage + "%";
             score.text = Math.Round(points * p).ToString("N0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", " ") +
                 " / " + maximum.ToString("N0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", " ");

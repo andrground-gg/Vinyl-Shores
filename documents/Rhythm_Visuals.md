@@ -149,11 +149,10 @@ on the left, five judgement counts on the right, and a separate gold-framed Best
 Combo achievement below the counts. Restart is available immediately and cancels
 animations. Header, table and button share the flat navy/cream pixel HUD style.
 
-Percentage is rounded to a whole number with midpoint values rounded away from
-zero. Stars and the pass/fail title use that same rounded number: 49.5 becomes
-50 (one star/pass), 69.5 becomes 70 (two), and 89.5 becomes 90 (three). Raw points,
-hit ratings and the score denominator are unchanged. The counter animates toward
-the rounded final percentage. Unawarded stars remain empty; no persistent rewards
+Stars and the pass/fail title use the unrounded percentage: 49.5 fails,
+69.5 earns one star and 89.5 earns two. The displayed percentage is rounded
+down. Raw points, hit ratings and the score denominator are unchanged.
+The counter animates toward the displayed percentage. Unawarded stars remain empty; no persistent rewards
 or ending progression are introduced.
 
 ## Result sprite states
@@ -161,7 +160,7 @@ or ending progression are introduced.
 Result stars now use dedicated Point-filtered `StarFilled`/`StarEmpty` sprites in
 `Assets/Art/Rhythm/ResultSprites`, enlarged to 125 UI units. The filled star is
 flat gold with an ink edge; the empty star has a continuous cream contour.
-Existing sequential fill masks and the rounded award rules are retained.
+Existing sequential fill masks use the unrounded award thresholds.
 
 Restart uses native Button Sprite Swap with dedicated normal (cream), hover/
 selected (mint), pressed (gold), and disabled (muted) sprites. Sliced borders

@@ -22,8 +22,8 @@ Each note has a zero-based **Beat** position and a **Lane** (`Left` or
 `Right`). Fractional beats are supported. For example, with 100 BPM and a
 0.3-second first-beat offset, beat 2.5 hits at `0.3 + 2.5 * 60 / 100 = 1.8`
 seconds into the file. Repeated lanes, rests, and different note counts
-require no code changes. The initial asset preserves beats 0–199,
-alternating Left/Right, with an offset of zero.
+require no code changes. The initial asset uses reusable patterns and an
+offset of zero.
 
 Notes are sorted in a runtime copy; the asset's list is not reordered or
 modified by playing. Each attempt snapshots the song settings. Changes
@@ -50,7 +50,7 @@ audio file is edited. The result waits for the last note's late window.
 Windows include their endpoints and can be adjusted on `RhythmPlayback`.
 An extra or wrong-lane press resets combo without deducting points or
 consuming another lane's note. Misses also reset combo. The percentage is
-earned points divided by `note count * 100` (20,000 for the initial asset), including missed
+earned points divided by `note count * 100` for the initial asset, including missed
 notes. During play only combo 2 and above is shown beside the hit markers.
 The result screen animates points, percentage, and earned stars at
 50/70/90%, alongside counts and best combo. Restart clears the attempt.
@@ -79,5 +79,5 @@ This remains an isolated prototype: no Beach integration, record rewards,
 star persistence, hold notes, or pause menu. Shared movement, dialogue, and
 Input Actions are unchanged.
 
-Result percentage is rounded to an integer before pass/fail and star thresholds
-are applied (midpoints away from zero). See Rhythm_Visuals.md for examples.
+Pass/fail and star thresholds use the unrounded percentage. The displayed
+percentage is rounded down so it never shows a threshold not reached.
