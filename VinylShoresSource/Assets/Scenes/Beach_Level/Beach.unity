@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: 191989931}
   - component: {fileID: 191989933}
   - component: {fileID: 191989932}
+  - component: {fileID: 191989934}
   m_Layer: 0
   m_Name: Beach_Guardian
   m_TagString: Untagged
@@ -360,6 +361,18 @@ Transform:
   - {fileID: 1393527709}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &191989934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191989928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bf315f303f341b0a8947f020354479c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.BeachRhythmChallenge
 --- !u!114 &191989932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -378,7 +391,7 @@ MonoBehaviour:
     text: I'm the beach musician, and I'm looking after Old Spin's first record.
   - speaker: Record Guardian 1
     portrait: {fileID: 0}
-    text: My rhythm challenge is not connected yet. Come back when the music is ready.
+    text: Ready? Let us see if you can follow my rhythm.
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}
@@ -8359,8 +8372,7 @@ MonoBehaviour:
     text: Look northwest along the beach for the first record guardian.
   - speaker: Old Spin
     portrait: {fileID: 0}
-    text: You can talk to all three guardians now. Their musical challenges are coming
-      later.
+    text: Talk to each guardian and take on their rhythm challenge.
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}
@@ -23898,6 +23910,7 @@ GameObject:
   - component: {fileID: 1795418836}
   - component: {fileID: 1795418838}
   - component: {fileID: 1795418837}
+  - component: {fileID: 1795418839}
   m_Layer: 0
   m_Name: Gate_Guardian
   m_TagString: Untagged
@@ -23921,6 +23934,18 @@ Transform:
   - {fileID: 577941633}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1795418839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795418833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bf315f303f341b0a8947f020354479c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.BeachRhythmChallenge
 --- !u!114 &1795418837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23939,8 +23964,7 @@ MonoBehaviour:
     text: I guard Old Spin's third record here by the gate.
   - speaker: Record Guardian 3
     portrait: {fileID: 0}
-    text: My rhythm challenge is not connected yet. No record is awarded by this
-      conversation.
+    text: Ready? Show me that you can keep the beat.
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}
@@ -26575,6 +26599,7 @@ GameObject:
   - component: {fileID: 2071248294}
   - component: {fileID: 2071248296}
   - component: {fileID: 2071248295}
+  - component: {fileID: 2071248297}
   m_Layer: 0
   m_Name: Kid2
   m_TagString: Untagged
@@ -26598,6 +26623,18 @@ Transform:
   - {fileID: 1696632882}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2071248297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071248291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bf315f303f341b0a8947f020354479c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.BeachRhythmChallenge
 --- !u!114 &2071248295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26616,7 +26653,7 @@ MonoBehaviour:
     text: I've been keeping Old Spin's second record safe here on the island.
   - speaker: Record Guardian 2
     portrait: {fileID: 0}
-    text: My rhythm challenge is not connected yet. Come back when the music is ready.
+    text: Ready? Let us see if you can follow my rhythm.
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}

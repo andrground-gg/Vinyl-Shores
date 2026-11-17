@@ -38,6 +38,7 @@ namespace VinylShores.Rhythm
         private bool running;
         public float PlayerEnergy { get; private set; } = 0.5f;
         public float OpponentEnergy => 1 - PlayerEnergy;
+        public void SetOpponentSprite(Sprite sprite) => opponent.SetSprite(sprite);
         public RhythmLocation CurrentLocation { get; private set; }
         public bool IsConfigured
         {

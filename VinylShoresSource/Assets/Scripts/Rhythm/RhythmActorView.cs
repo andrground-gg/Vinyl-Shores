@@ -30,6 +30,13 @@ namespace VinylShores.Rhythm
         public float CurrentHopHeight => height;
         public double CurrentHopPeriod => period;
 
+        public void SetSprite(Sprite sprite)
+        {
+            if (sprite == null) return;
+            idle = jump = sprite;
+            if (actor != null) actor.sprite = sprite;
+        }
+
         private void Initialize()
         {
             if (initialized) return;

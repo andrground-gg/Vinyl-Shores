@@ -337,6 +337,7 @@ namespace VinylShores.Rhythm
             if (comboView != null) comboView.ResetView();
             State = RhythmPlaybackState.Error;
             ShowReady("Song unavailable", message, "Try again");
+            resultView.ShowReturnButton(false);
         }
 
         private void StopPlayback()
@@ -364,6 +365,8 @@ namespace VinylShores.Rhythm
             if (!configured) return;
             leftAction.Enable();
             rightAction.Enable();
+            if (BeachRhythmSession.IsActive)
+                stageView.SetOpponentSprite(BeachRhythmSession.OpponentSprite);
             State = RhythmPlaybackState.Ready;
             readyPanel.SetActive(false);
             BeginPlayback();

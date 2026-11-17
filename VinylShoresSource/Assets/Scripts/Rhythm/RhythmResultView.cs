@@ -18,6 +18,7 @@ namespace VinylShores.Rhythm
         [SerializeField] private GameObject headerFrame;
         [SerializeField] private RectTransform[] starRoots;
         [SerializeField] private RectTransform[] fillMasks;
+        private UnityEngine.UI.Button returnButton;
         private bool animating;
         private double startedDsp;
         private int points;
@@ -39,6 +40,7 @@ namespace VinylShores.Rhythm
         public void ResetView()
         {
             animating = false;
+            if (returnButton != null) returnButton.gameObject.SetActive(false);
             EarnedStars = 0;
             if (!IsConfigured) return;
             details.SetActive(false);
@@ -84,7 +86,30 @@ namespace VinylShores.Rhythm
                 for (int i = 0; i < 5; i++) statisticValues[i].text = values[i].ToString();
             }
             if (bestComboValue != null) bestComboValue.text = session.BestCombo.ToString();
+            ShowReturnButton(true);
             UpdateResult();
+        }
+
+        public void ShowReturnButton(bool resultLayout)
+        {
+            if (!BeachRhythmSession.IsActive || restartButton == null) return;
+            if (returnButton == null)
+            {
+                var copy = Instantiate(restartButton.gameObject, restartButton.parent);
+                copy.name = "ReturnToBeachButton";
+                returnButton = copy.GetComponent<UnityEngine.UI.Button>();
+                returnButton.onClick.RemoveAllListeners();
+                returnButton.onClick.AddListener(BeachRhythmSession.ReturnToBeach);
+            }
+            var rect = (RectTransform)returnButton.transform;
+            rect.sizeDelta = resultLayout ? new Vector2(470, 58) : new Vector2(240, 54);
+            rect.anchoredPosition = resultLayout ? new Vector2(-255, -218) : new Vector2(-140, -105);
+            if (!resultLayout) restartButton.anchoredPosition = new Vector2(140, -105);
+            var label = returnButton.GetComponentInChildren<TMP_Text>(true);
+            label.text = "Return to beach";
+            label.fontSize = resultLayout ? 42 : 24;
+            returnButton.interactable = true;
+            returnButton.gameObject.SetActive(true);
         }
 
         private void Update()
