@@ -13,6 +13,7 @@ namespace VinylShores.Rhythm
     {
         [Header("Track")]
         [SerializeField] private RhythmSong song;
+        [SerializeField] private RhythmSong beachSong;
         [SerializeField] private AudioSource countInSource;
         [SerializeField] private AudioSource musicSource;
         [SerializeField, Min(0.1f)] private double leadSeconds = 2.4;
@@ -51,6 +52,10 @@ namespace VinylShores.Rhythm
         private const int CountInBeats = 4;
         private const double PreparationSeconds = 0.2;
         private const string CalibrationPreference = "VinylShores.RhythmPrototype.VisualDelayMs";
+        private const string BeachSongCalibrationPreference = "VinylShores.BeachSong1.VisualDelayMs.v2";
+        private const float BeachSongDefaultDelayMilliseconds = 110f;
+        private float defaultVisualDelayMilliseconds;
+        private string calibrationPreferenceKey;
         private InputAction leftAction;
         private InputAction rightAction;
         private RhythmChart chart;
@@ -110,7 +115,10 @@ namespace VinylShores.Rhythm
             }
             foreach (var source in countSources) ConfigureSource(source);
             foreach (var lane in lanes) lane.Initialize();
-            SetVisualDelay(PlayerPrefs.GetFloat(CalibrationPreference, visualDelayMilliseconds));
+            bool beachChallenge = BeachRhythmSession.IsActive;
+            calibrationPreferenceKey = beachChallenge ? BeachSongCalibrationPreference : CalibrationPreference;
+            defaultVisualDelayMilliseconds = beachChallenge ? BeachSongDefaultDelayMilliseconds : visualDelayMilliseconds;
+            SetVisualDelay(PlayerPrefs.GetFloat(calibrationPreferenceKey, defaultVisualDelayMilliseconds));
             leftAction = new InputAction("RhythmLeft", InputActionType.Button, "<Keyboard>/leftArrow");
             rightAction = new InputAction("RhythmRight", InputActionType.Button, "<Keyboard>/rightArrow");
             leftAction.performed += OnLeftPressed;
@@ -147,12 +155,13 @@ namespace VinylShores.Rhythm
 
         private bool PrepareSong()
         {
-            if (song == null)
+            RhythmSong selectedSong = BeachRhythmSession.IsActive ? beachSong : song;
+            if (selectedSong == null)
             {
                 FailLoading("Assign a Rhythm Song asset on RhythmPlayback.");
                 return false;
             }
-            if (!song.TryCreateChart(out var preparedChart, out string error))
+            if (!selectedSong.TryCreateChart(out var preparedChart, out string error))
             {
                 FailLoading(error);
                 return false;
@@ -221,7 +230,7 @@ namespace VinylShores.Rhythm
                 if (keyboard.spaceKey.wasPressedThisFrame) BeginPlayback();
                 if (keyboard.minusKey.wasPressedThisFrame) SaveVisualDelay(visualDelayMilliseconds - 10);
                 if (keyboard.equalsKey.wasPressedThisFrame) SaveVisualDelay(visualDelayMilliseconds + 10);
-                if (keyboard.backspaceKey.wasPressedThisFrame) SaveVisualDelay(0);
+                if (keyboard.backspaceKey.wasPressedThisFrame) SaveVisualDelay(defaultVisualDelayMilliseconds);
             }
             if (State == RhythmPlaybackState.Loading)
             {
@@ -301,7 +310,7 @@ namespace VinylShores.Rhythm
         private void SaveVisualDelay(float milliseconds)
         {
             SetVisualDelay(milliseconds);
-            PlayerPrefs.SetFloat(CalibrationPreference, visualDelayMilliseconds);
+            PlayerPrefs.SetFloat(calibrationPreferenceKey, visualDelayMilliseconds);
             PlayerPrefs.Save();
         }
 

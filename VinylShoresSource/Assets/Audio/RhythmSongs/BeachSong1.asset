@@ -1,0 +1,147 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c47efada0bd6c6f44904c794adbf7ce5, type: 3}
+  m_Name: BeachSong1
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.RhythmSong
+  track: {fileID: 8300000, guid: 2886809f16f5cd3428a27a5e26b21192, type: 3}
+  trackTitle: Beach Song 1
+  location: 0
+  bpm: 150
+  firstBeatOffsetSeconds: 0
+  notes:
+  - beat: 68.5
+    lane: 1
+  - beat: 69.5
+    lane: 1
+  - beat: 71
+    lane: 0
+  - beat: 148.5
+    lane: 1
+  - beat: 149.5
+    lane: 1
+  - beat: 151
+    lane: 0
+  patterns:
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 0
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 4
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 8
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 12
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 16
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 20
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 24
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 28
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 32
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 36
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 40
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 44
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 48
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 52
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 56
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 60
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 64
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 72
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 76
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 80
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 84
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 88
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 92
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 96
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 100
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 104
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 108
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 112
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 116
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 120
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 124
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 128
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 132
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 136
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 140
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 144
+    mirror: 0
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 152
+    mirror: 1
+  - pattern: {fileID: 11400000, guid: 196b91cee19e4c7e95905bd9d1ce110b, type: 2}
+    startBeat: 156
+    mirror: 1

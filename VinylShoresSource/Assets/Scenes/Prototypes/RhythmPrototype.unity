@@ -14724,6 +14724,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.RhythmPrototypeController
   song: {fileID: 11400000, guid: 122fb2701f1691f40a4cfca508565607, type: 2}
+  beachSong: {fileID: 11400000, guid: 63acbe867ea14e56ab482dfb8097f145, type: 2}
   countInSource: {fileID: 24030879}
   musicSource: {fileID: 1150491095}
   leadSeconds: 2.4
