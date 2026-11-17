@@ -212,6 +212,10 @@ The scene has one player, one shared `DialogueCanvas`, and four stationary NPCs:
 work can still identify the same objects. The knight is one of the three record
 guardians, not an additional gate-opening NPC.
 
+The dialogue content for these four NPCs is specified in
+[Beach_Dialogue_Script.md](Beach_Dialogue_Script.md). The scene still contains
+the original placeholder lines until that script is applied in Phase B.
+
 All four have an explicit reference to the scene player and shared `DialogueUI`.
 The player has `PlayerMovementLock` and the `Player` tag. Interact with E as in
 the prototype; closing a conversation restores movement, and conversations can
@@ -270,8 +274,13 @@ their bases and keep the walkable upper parts on Above_Player.
 
 ### Temporary limits
 
-- Dialogue text is placeholder English text. Old Spin gives a static clue to
-  the first guardian northwest along the beach.
+- Dialogue text in Beach is still the original placeholder and contradicts the
+  final narrative: Old Spin mentions three records upfront, the guardians reveal
+  their record number, and the speakers are `Record Guardian 1/2/3`. The
+  approved script is [Beach_Dialogue_Script.md](Beach_Dialogue_Script.md). It is
+  documentation only; the scene is updated in Phase B together with record state
+  and rhythm variants. Do not copy individual lines into the scene before that
+  integration.
 - All guardians are available immediately. Dialogue completion awards no
   record and does not start a fake challenge; `onDialogueFinished` has no
   progression listener in Beach.
@@ -289,5 +298,8 @@ their bases and keep the walkable upper parts on Above_Player.
 - `onDialogueFinished`: implemented; the test scene wires it to a logger.
 - Dialogue prefabs: implemented.
 - Rhythm challenge: not implemented; waiting for the rhythm system.
+- Beach dialogue script: written and approved in
+  `documents/Beach_Dialogue_Script.md`; not applied to the scene yet. Phase B
+  needs record state, rhythm results and gate state first.
 - The standalone movement and dialogue prototypes are merged into main (PRs
   #1 and #2). Beach integration is reviewed and delivered separately.
