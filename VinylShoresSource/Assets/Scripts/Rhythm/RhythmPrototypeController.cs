@@ -37,6 +37,7 @@ namespace VinylShores.Rhythm
         [SerializeField] private TMP_Text countText;
         [SerializeField] private TMP_Text elapsedText;
         [SerializeField] private TMP_Text durationText;
+        [SerializeField] private TMP_Text playbackTimeText;
         [SerializeField] private RectTransform progressFill;
         [SerializeField] private RectTransform progressTrack;
         [SerializeField] private RhythmStageView stageView;
@@ -240,7 +241,7 @@ namespace VinylShores.Rhythm
                 StopPlayback();
                 State = RhythmPlaybackState.Finished;
                 UpdateProgress(DurationSeconds);
-                ShowReady(Scoring.ScorePercentage >= 50 ? "Challenge passed" : "Try that beat again",
+                ShowReady(RhythmResultView.StarsForPercentage(Scoring.ScorePercentage) > 0 ? "Challenge passed" : "Try that beat again",
                     $"Perfect: {Scoring.Perfects}   Good: {Scoring.Goods}   OK: {Scoring.Oks}\n" +
                     $"Miss: {Scoring.Misses}   Extra presses: {Scoring.ExtraPresses}\n" +
                     $"Best combo: {Scoring.BestCombo}", "Restart");
@@ -289,12 +290,6 @@ namespace VinylShores.Rhythm
             stageView.Judge(result, Scoring.Combo);
         }
 
-        private void ShowInitialReady()
-        {
-            ShowReady("Ready to find the beat?",
-                "Press Space or Start", "Start");
-        }
-
         public void SetVisualDelay(float milliseconds)
         {
             if (float.IsNaN(milliseconds) || float.IsInfinity(milliseconds))
@@ -312,6 +307,8 @@ namespace VinylShores.Rhythm
 
         private void UpdateProgress(double time)
         {
+            if (playbackTimeText != null)
+                playbackTimeText.text = FormatTime(time) + " / " + FormatTime(DurationSeconds);
             elapsedText.text = FormatTime(time);
             durationText.text = FormatTime(DurationSeconds);
             progressFill.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
@@ -368,9 +365,8 @@ namespace VinylShores.Rhythm
             leftAction.Enable();
             rightAction.Enable();
             State = RhythmPlaybackState.Ready;
-            if (PrepareSong()) ShowInitialReady();
-            countText.text = "";
-            UpdateProgress(0);
+            readyPanel.SetActive(false);
+            BeginPlayback();
         }
 
         private void OnDestroy()

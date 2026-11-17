@@ -1,12 +1,12 @@
 # Rhythm prototype
 
 Open `Assets/Scenes/Prototypes/RhythmPrototype.unity` in Unity 6000.3.12f1.
-Press Start or Space, listen to the four-beat count-in, then press Left Arrow
+The scene automatically starts a four-beat count-in without a Ready dialog. Press Left Arrow
 for the upper lane and Right Arrow for the lower lane. Each note requires a
 new press; holding a key does not repeat hits.
 
-The original metronome is 100 BPM, 4/4, 50 bars. The chart contains 200
-alternating tap notes at `beat * 0.6` seconds, from 0 to 119.4 seconds.
+The original metronome is 100 BPM, 4/4, 50 bars. The chart contains 213 taps arranged from eight reusable patterns across 50 bars,
+from 0 to 119.4 seconds. See [Pattern authoring](Rhythm_Patterns.md).
 Notes travel right to left with a 2.4-second approach.
 
 ## Song assets and note authoring
@@ -78,3 +78,6 @@ Restart, disable, and scene exit clear the effects.
 This remains an isolated prototype: no Beach integration, record rewards,
 star persistence, hold notes, or pause menu. Shared movement, dialogue, and
 Input Actions are unchanged.
+
+Result percentage is rounded to an integer before pass/fail and star thresholds
+are applied (midpoints away from zero). See Rhythm_Visuals.md for examples.

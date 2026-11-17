@@ -13,6 +13,7 @@ namespace VinylShores.Rhythm
         [SerializeField] private RectTransform hitTarget;
         [SerializeField] private UnityEngine.UI.Image hitPulse;
         [SerializeField] private TMP_Text judgementText;
+        [SerializeField] private CanvasGroup judgementBurst;
         [SerializeField] private int laneIndex;
         [SerializeField] private float spawnX = 500f;
         [SerializeField] private float exitX = -500f;
@@ -27,6 +28,7 @@ namespace VinylShores.Rhythm
         private double judgementStartDsp = double.NegativeInfinity;
         private Color reactionColor;
         private bool failedReaction;
+        private bool failedJudgement;
         private const double PressDuration = 0.2;
         private const double PulseDuration = 0.24;
         private const double JudgementDuration = 0.7;
@@ -103,12 +105,8 @@ namespace VinylShores.Rhythm
         public void ShowJudgement(RhythmHitResult result, Color color)
         {
             bool failed = result.Rating == RhythmRating.Miss || result.Rating == RhythmRating.EmptyPress;
-            string label = result.Rating == RhythmRating.EmptyPress ? "EXTRA PRESS" : result.Rating.ToString().ToUpperInvariant();
-            if (!failed)
-            {
-                label += Math.Abs(result.ErrorSeconds) < 0.001 ? "  <size=11>ON TIME</size>" :
-                    $"  <size=11>{(result.ErrorSeconds < 0 ? "EARLY" : "LATE")} {Math.Abs(result.ErrorSeconds) * 1000:F0} ms</size>";
-            }
+            string label = result.Rating == RhythmRating.EmptyPress ? "EXTRA" : result.Rating.ToString().ToUpperInvariant();
+            failedJudgement = failed;
             judgementText.text = label;
             judgementText.color = color;
             judgementText.alpha = 1;
@@ -141,10 +139,43 @@ namespace VinylShores.Rhythm
             targetImage.color = Color.Lerp(targetColor, failedReaction ? reactionColor : Color.white, intensity);
 
             float age = (float)(now - judgementStartDsp);
-            judgementText.alpha = 1 - Mathf.Clamp01((age - 0.5f) / 0.2f);
-            judgementText.rectTransform.anchoredPosition = age < JudgementDuration ?
-                judgementPosition + Vector2.up * (3 * Mathf.Clamp01(age / 0.15f)) : judgementPosition;
-            if (age >= JudgementDuration) judgementText.text = "";
+            float fade = 1 - Mathf.Clamp01((age - 0.38f) / 0.24f);
+            judgementText.alpha = fade;
+            var textRect = judgementText.rectTransform;
+            if (age < JudgementDuration)
+            {
+                float p = Mathf.Clamp01(age / 0.28f);
+                if (failedJudgement)
+                {
+                    float drop = 1 - Mathf.Pow(1 - p, 3);
+                    textRect.localScale = Vector3.one * Mathf.Lerp(1.08f, 0.92f, drop);
+                    textRect.anchoredPosition = judgementPosition + new Vector2(
+                        Mathf.Sin(age * 35) * 2 * (1 - p), -9 * drop);
+                    textRect.localRotation = Quaternion.Euler(0, 0, -2 * drop);
+                }
+                else
+                {
+                    float pop = Mathf.Sin(p * Mathf.PI);
+                    float enter = Mathf.Lerp(0.88f, 1, Mathf.Clamp01(age / 0.045f));
+                    textRect.localScale = Vector3.one * (enter + 0.16f * pop);
+                    textRect.anchoredPosition = judgementPosition + Vector2.up * (7 * Mathf.Sin(p * Mathf.PI));
+                    textRect.localRotation = Quaternion.Euler(0, 0, -1.5f * Mathf.Sin(p * Mathf.PI));
+                }
+            }
+            else
+            {
+                judgementText.text = "";
+                textRect.anchoredPosition = judgementPosition;
+                textRect.localScale = Vector3.one;
+                textRect.localRotation = Quaternion.identity;
+            }
+            if (judgementBurst != null)
+            {
+                float p = Mathf.Clamp01(age / 0.36f);
+                judgementBurst.gameObject.SetActive(!failedJudgement && p < 1);
+                judgementBurst.alpha = 1 - p;
+                judgementBurst.transform.localScale = Vector3.one * Mathf.Lerp(0.6f, 1.3f, p);
+            }
         }
 
         private void ResetFeedback()
@@ -159,10 +190,13 @@ namespace VinylShores.Rhythm
                 hitPulse.color = color;
                 hitPulse.rectTransform.localScale = Vector3.one;
             }
+            if (judgementBurst != null) judgementBurst.gameObject.SetActive(false);
             if (judgementText != null)
             {
                 judgementText.text = "";
                 judgementText.alpha = 0;
+                judgementText.rectTransform.localScale = Vector3.one;
+                judgementText.rectTransform.localRotation = Quaternion.identity;
                 judgementText.rectTransform.anchoredPosition = judgementPosition;
             }
         }
