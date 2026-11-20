@@ -250,6 +250,7 @@ namespace VinylShores.Rhythm
                 StopPlayback();
                 State = RhythmPlaybackState.Finished;
                 UpdateProgress(DurationSeconds);
+                BeachRhythmSession.ReportResult(Scoring.ScorePercentage);
                 ShowReady(RhythmResultView.StarsForPercentage(Scoring.ScorePercentage) > 0 ? "Challenge passed" : "Try that beat again",
                     $"Perfect: {Scoring.Perfects}   Good: {Scoring.Goods}   OK: {Scoring.Oks}\n" +
                     $"Miss: {Scoring.Misses}   Extra presses: {Scoring.ExtraPresses}\n" +
