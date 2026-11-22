@@ -9,7 +9,7 @@ challenge). Owner: Aitor.
 
 | File | Change |
 | --- | --- |
-| `Assets/Scripts/Progress/RecordProgress.cs` | New. Minimal in-memory progress: `HasRecord`, `GetBestStars`, `Submit`, `CollectedCount`, `TotalBestStars`, `Changed` event. Resets when Play Mode starts. No save file. |
+| `Assets/Scripts/Progress/RecordProgress.cs` | Session progress. Full API in [Record_Progress.md](Record_Progress.md). |
 | `Assets/Scripts/Rhythm/BeachRhythmChallenge.cs` | `BeachRhythmChallenge` gets a `recordId`, a `State` and three UnityEvents. `BeachRhythmSession` receives the challenge id and a return callback, and keeps the best attempt of the visit. |
 | `Assets/Scripts/Rhythm/RhythmPrototypeController.cs` | One line: when a song finishes it calls `BeachRhythmSession.ReportResult(percentage)`. |
 | `Assets/Scenes/Beach_Level/Beach.unity` | `Beach_Guardian` has `recordId = beach_1`. `Kid2` and `Gate_Guardian` keep an empty id (practice only, grant nothing) until records 2 and 3 are wired. |
@@ -23,7 +23,7 @@ DialogueInteractable.onDialogueFinished
   -> each finished song: BeachRhythmSession.ReportResult(percentage)       // Restart = retry, best attempt kept
   -> "Return to beach": rhythm scene unloaded, Beach roots restored
   -> callback(BeachRhythmOutcome { Attempts, BestPercentage, Stars })
-  -> BeachRhythmChallenge: < 50% -> nothing; >= 50% -> RecordProgress.Submit(recordId, stars)
+  -> BeachRhythmChallenge: < 50% -> nothing; >= 50% -> RecordProgress.ReportChallengeResult(recordId, stars)
 ```
 
 Rules implemented:
