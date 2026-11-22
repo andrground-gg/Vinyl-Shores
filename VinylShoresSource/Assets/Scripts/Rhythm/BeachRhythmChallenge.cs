@@ -76,11 +76,18 @@ namespace VinylShores.Rhythm
                 return;
             }
 
-            RecordSubmission result = RecordProgress.Submit(recordId, outcome.Stars);
+            RecordSubmission result = RecordProgress.ReportChallengeResult(recordId, outcome.Stars);
+            if (!result.Accepted)
+            {
+                // Unknown id (typo in the Inspector): RecordProgress already logged an error.
+                State = BeachChallengeState.Pending;
+                return;
+            }
             State = BeachChallengeState.Completed;
             Log($"passed with {outcome.BestPercentage:0.#}% ({result.Stars} stars). " +
                 (result.GrantedNow ? $"Record '{recordId}' GRANTED. " : $"Record '{recordId}' already owned, not granted again. ") +
-                $"Best stars: {result.BestStars}. Records: {RecordProgress.CollectedCount}, total best stars: {RecordProgress.TotalBestStars}.");
+                $"Best stars: {result.BestStars}. Beach: {RecordProgress.GetCollectedCount(IslandArea.Beach)}/{RecordCatalog.RecordsPerArea}. " +
+                $"Records: {RecordProgress.CollectedCount}/{RecordCatalog.Count}, total best stars: {RecordProgress.TotalBestStars}/{RecordProgress.MaxTotalStars}.");
             if (result.GrantedNow) onRecordGranted.Invoke();
             else onReplayPassed.Invoke();
         }
