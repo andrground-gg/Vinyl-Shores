@@ -361,6 +361,7 @@ GameObject:
   - component: {fileID: 191989933}
   - component: {fileID: 191989932}
   - component: {fileID: 191989934}
+  - component: {fileID: 191989935}
   m_Layer: 0
   m_Name: Beach_Guardian
   m_TagString: Untagged
@@ -397,6 +398,56 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.BeachRhythmChallenge
   recordId: beach_1
+--- !u!114 &191989935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 191989928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb2561bd33164481b41fb1119e2bb3e8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.BeachDialogue
+  firstInvitation:
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "Hey, friend. Old Spin sent you? He still remembers the tide, huh."
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "This record's got a good groove. I kept it safe."
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "Think you can keep up with it?"
+  repeatInvitation:
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "The tide's right. Let's ride that groove."
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "Keep the beat and the record is yours."
+  failure:
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "Ah, the beat got away from you. No shame."
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "Shake it off. Try again when you're ready."
+  success:
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "Yeah! That's the groove. Here's the record."
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "There's more of his music out there. I can feel it."
+  replayInvitation:
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "You already got this one, friend."
+  - speaker: "Beach Guardian"
+    portrait: {fileID: 0}
+    text: "Want to ride the rhythm again?"
 --- !u!114 &191989932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,13 +460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2573b3ead02b484ca81f3549b5cbb9f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.DialogueInteractable
-  lines:
-  - speaker: Record Guardian 1
-    portrait: {fileID: 0}
-    text: I'm the beach musician, and I'm looking after Old Spin's first record.
-  - speaker: Record Guardian 1
-    portrait: {fileID: 0}
-    text: Ready? Let us see if you can follow my rhythm.
+  lines: []
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}
@@ -8374,6 +8419,7 @@ GameObject:
   - component: {fileID: 902093754}
   - component: {fileID: 902093756}
   - component: {fileID: 902093755}
+  - component: {fileID: 902093757}
   m_Layer: 0
   m_Name: Old-Spin
   m_TagString: Untagged
@@ -8397,6 +8443,140 @@ Transform:
   - {fileID: 1542591460}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &902093757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902093751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb2561bd33164481b41fb1119e2bb3e8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.BeachDialogue
+  guideHints:
+  - RecordId: beach_1
+    First:
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Well, now. A visitor? The years don't bring many strangers here."
+    - speaker: "Boy"
+      portrait: {fileID: 0}
+      text: "I came looking for inspiration. They say you're a great composer."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "A great composer? That was a long time ago, child."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "I wrote an album once. Then I lost it. Or it lost me."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Since then, I haven't had the strength to write or to search."
+    - speaker: "Boy"
+      portrait: {fileID: 0}
+      text: "I'll help you find your album. In return, help me compose mine."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "A trade? You help an old man, and he helps you?"
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "All right. We have a deal."
+    - speaker: "Boy"
+      portrait: {fileID: 0}
+      text: "Do you remember where you wrote any of them?"
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "The first one... I wrote it with the beach musician."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Northwest, past the stumps, where the trees meet the sand."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "He may have kept a copy. Ask about the tide and the rhythm."
+    Repeat:
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "The first one was with the beach musician."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Northwest, past the stumps, where the trees meet the sand."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "He may have kept a copy. Ask about the tide and the rhythm."
+  - RecordId: beach_2
+    First:
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "That label... I know that label. You found it."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Put it here, child. Let me hear it again."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "There's another. I wrote it on the east side, out by the rocks."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "The young islander would know. They keep the songs of the shore."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Go east, past the cabin. Look for the open sand by the eastern rocks."
+    Repeat:
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "The next one was with the young islander."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "East, past the cabin, to the open sand by the eastern rocks."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "They know the songs I wrote for the shore."
+  - RecordId: beach_3
+    First:
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Two. Two of them, back from the sea."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "I can almost hear the whole thing again."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "One more... I wrote it by the stone gate, north through the trees."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "The knight watched that place. He may keep more than duty."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "Ask him for the record. He guards it, not the gate."
+    Repeat:
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "The last one was with the knight."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "North through the trees, by the stone gate."
+    - speaker: "Old Spin"
+      portrait: {fileID: 0}
+      text: "He guards the record, not the gate."
+  beachComplete:
+  - speaker: "Old Spin"
+    portrait: {fileID: 0}
+    text: "Three. Three songs I thought the sea had taken."
+  - speaker: "Old Spin"
+    portrait: {fileID: 0}
+    text: "I don't know if there are more. I don't even remember writing all of them."
+  - speaker: "Old Spin"
+    portrait: {fileID: 0}
+    text: "But these three... these three are home."
+  - speaker: "Boy"
+    portrait: {fileID: 0}
+    text: "We make a good team."
+  - speaker: "Old Spin"
+    portrait: {fileID: 0}
+    text: "We do. And I still owe you a song, child."
+  - speaker: "Old Spin"
+    portrait: {fileID: 0}
+    text: "Rest first. Then we'll cross the gate and see if the rest of the album is out there."
 --- !u!114 &902093755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8409,17 +8589,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2573b3ead02b484ca81f3549b5cbb9f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.DialogueInteractable
-  lines:
-  - speaker: Old Spin
-    portrait: {fileID: 0}
-    text: Welcome to Vinyl Shores. Three of my records are being kept safe on this
-      beach.
-  - speaker: Old Spin
-    portrait: {fileID: 0}
-    text: Look northwest along the beach for the first record guardian.
-  - speaker: Old Spin
-    portrait: {fileID: 0}
-    text: Talk to each guardian and take on their rhythm challenge.
+  lines: []
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}
@@ -24027,6 +24197,7 @@ GameObject:
   - component: {fileID: 1795418838}
   - component: {fileID: 1795418837}
   - component: {fileID: 1795418839}
+  - component: {fileID: 1795418840}
   m_Layer: 0
   m_Name: Gate_Guardian
   m_TagString: Untagged
@@ -24062,6 +24233,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bf315f303f341b0a8947f020354479c, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.BeachRhythmChallenge
+  recordId: beach_3
+--- !u!114 &1795418840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795418833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb2561bd33164481b41fb1119e2bb3e8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.BeachDialogue
+  requiredRecord: beach_2
+  locked:
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "The earlier records must be found before mine."
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "I keep the order, not the gate."
+  firstInvitation:
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "Halt. State your purpose."
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "Old Spin's record lies under my watch. The gate is not my charge."
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "If you would claim it, prove your rhythm."
+  repeatInvitation:
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "You return. Steady your hands."
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "Play, and the record is yours by right."
+  failure:
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "You falter. The record remains with me."
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "Return when your hands are steady."
+  success:
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "Well fought. The last beach record is yours."
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "Tell Old Spin. His shore is whole again."
+  replayInvitation:
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "The record is already yours. I have no quarrel with you."
+  - speaker: "Knight"
+    portrait: {fileID: 0}
+    text: "I can play the song again, if you wish."
 --- !u!114 &1795418837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24074,13 +24304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2573b3ead02b484ca81f3549b5cbb9f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.DialogueInteractable
-  lines:
-  - speaker: Record Guardian 3
-    portrait: {fileID: 0}
-    text: I guard Old Spin's third record here by the gate.
-  - speaker: Record Guardian 3
-    portrait: {fileID: 0}
-    text: Ready? Show me that you can keep the beat.
+  lines: []
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}
@@ -26716,6 +26940,7 @@ GameObject:
   - component: {fileID: 2071248296}
   - component: {fileID: 2071248295}
   - component: {fileID: 2071248297}
+  - component: {fileID: 2071248298}
   m_Layer: 0
   m_Name: Kid2
   m_TagString: Untagged
@@ -26751,6 +26976,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bf315f303f341b0a8947f020354479c, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Rhythm.BeachRhythmChallenge
+  recordId: beach_2
+--- !u!114 &2071248298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071248291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb2561bd33164481b41fb1119e2bb3e8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.BeachDialogue
+  requiredRecord: beach_1
+  locked:
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Hey, Old Spin's first song comes first."
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Bring it back, then we'll talk rhythm."
+  firstInvitation:
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Whoa, a new face! Old Spin sent you? He never sends anyone."
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "I've been keeping one of his records safe. Island secret."
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Bet you can't keep up with our rhythm!"
+  repeatInvitation:
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "You came back! Ready for the island beat?"
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Play with me and the record is yours."
+  failure:
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Aw, close! The island beat is tricky, huh?"
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Try again! I'm not going anywhere."
+  success:
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Yes! You got it! Here's the record."
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "There's one more song out there. I can feel it."
+  replayInvitation:
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "You already beat me. That was cool."
+  - speaker: "Islander"
+    portrait: {fileID: 0}
+    text: "Wanna go again? I'll go easy. Maybe."
 --- !u!114 &2071248295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26763,13 +27047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2573b3ead02b484ca81f3549b5cbb9f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VinylShores.Dialogue.DialogueInteractable
-  lines:
-  - speaker: Record Guardian 2
-    portrait: {fileID: 0}
-    text: I've been keeping Old Spin's second record safe here on the island.
-  - speaker: Record Guardian 2
-    portrait: {fileID: 0}
-    text: Ready? Let us see if you can follow my rhythm.
+  lines: []
   interactionRadius: 1.5
   player: {fileID: 334456907}
   ui: {fileID: 2066327064}

@@ -78,9 +78,9 @@ scene. The same instance survives opening the rhythm challenge and returning to
 Beach. A new, empty session starts each time Play Mode starts (also with domain
 reload disabled). Nothing is written to disk; persistence can be a later task.
 
-Existing contracts are unchanged: `IPlayerMovementLock`, `DialogueUI` and
-`onDialogueFinished` are not modified. No production dialogue reads the
-progress yet, so nothing shows a fake completion.
+`BeachDialogue` reads this session progress to choose Old Spin's hints and
+check whether the Islander and Knight are available. Closing a hint or
+a result conversation does not submit a rhythm result.
 
 ## Checks (Unity 6000.3.12f1)
 
