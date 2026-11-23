@@ -12,7 +12,7 @@ challenge). Owner: Aitor.
 | `Assets/Scripts/Progress/RecordProgress.cs` | Session progress. Full API in [Record_Progress.md](Record_Progress.md). |
 | `Assets/Scripts/Rhythm/BeachRhythmChallenge.cs` | `BeachRhythmChallenge` gets a `recordId`, a `State` and three UnityEvents. `BeachRhythmSession` receives the challenge id and a return callback, and keeps the best attempt of the visit. |
 | `Assets/Scripts/Rhythm/RhythmPrototypeController.cs` | One line: when a song finishes it calls `BeachRhythmSession.ReportResult(percentage)`. |
-| `Assets/Scenes/Beach_Level/Beach.unity` | `Beach_Guardian` has `recordId = beach_1`. `Kid2` and `Gate_Guardian` keep an empty id (practice only, grant nothing) until records 2 and 3 are wired. |
+| `Assets/Scenes/Beach_Level/Beach.unity` | `Beach_Guardian`, `Kid2`, and `Gate_Guardian` grant `beach_1`, `beach_2`, and `beach_3` respectively. The Islander and Knight require the preceding record. |
 
 ## Challenge interface
 
@@ -37,9 +37,9 @@ Rules implemented:
 - Returning without finishing a song (audio error) changes nothing.
 - Stars never gate anything.
 
-The three UnityEvents are the hook for the guardian's success / failure /
-replay dialogue variants (Beach dialogue script, Phase B). Nothing is wired to
-them yet. Every result is logged to the Console with the prefix
+`BeachDialogue` uses the first-win and failure events to show the guardian's
+response on return. A later interaction with a guardian whose record is already
+owned offers a replay. Every result is logged to the Console with the prefix
 `[Beach record loop]`, which is how the tests below are verified.
 
 ## Manual test (Unity 6000.3.12f1)
@@ -57,13 +57,12 @@ arrows. Talk: E.
 | 5 | Talk again, fail. Return. | Log: `failed`, `State: Completed`. Record kept. |
 | 6 | Talk again. In the rhythm scene: pass, click **Restart**, fail, then return. | Counted as a pass (best attempt). Not granted twice. |
 | 7 | Repeat the full loop 3+ times. | No duplicate player, camera, dialogue UI or EventSystem in the Hierarchy. Movement never stuck. |
-| 8 | Talk to `Kid2` or `Gate_Guardian`, pass, return. | Log: `Practice only: no record id`. `Records` unchanged. |
+| 8 | Before collecting the previous record, talk to `Kid2` or `Gate_Guardian`. Then collect the prerequisite and pass their challenge. | The locked dialogue starts no song. A pass after unlocking grants the respective record. |
 | 9 | Exit and re-enter Play Mode. | Progress starts empty again (`Records: 1` after the first pass). |
-| 10 | Pause | Not available yet; re-test when the pause menu card is merged. |
+| 10 | Pause, then leave during the first attempt. | The player returns to the map without a result dialogue or a newly granted record. |
 
 ## Known limits
 
 - Progress is not saved between sessions (out of scope for the slice).
-- Guardian dialogue does not change after a result yet; use the UnityEvents.
 - All three guardians open the same Beach song.
-- No way to leave a song while it is playing until pause exists.
+- The exit gate and transition to the next area are still pending.

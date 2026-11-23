@@ -6,18 +6,10 @@ for the text; it does not describe code.
 
 ## Status
 
-- **Phase A (current):** this document only. `Beach.unity` still contains the
-  original placeholder lines and has **not** been edited.
-- **Phase B (blocked):** the lines are copied into the scene and wired to the
-  record state, the rhythm result and the gate state. Phase B needs the
-  progression API and the rhythm outcome, neither of which exists on `main`.
-- The scene is a shared file. Announce the Phase B scene edit to Aitor before
-  starting it.
-
-Because of that split, nothing in this file is playable yet. Do not paste
-individual lines into `Beach.unity` outside the Phase B integration: the
-current scene text contradicts this script (see
-[Current scene text](#current-scene-text-outdated)).
+`Beach.unity` uses these lines for the four Beach NPCs. `BeachDialogue` selects
+Old Spin's hints and guardian invitations from record progress. A first win or
+a failed attempt before collection shows the appropriate guardian response
+on return to the map. The gate-open variant is reserved for the gate transition.
 
 ## Scope
 
@@ -39,9 +31,6 @@ current scene text contradicts this script (see
 | `Beach Guardian` | Record guardian 1 | Beach musician. |
 | `Islander` | Record guardian 2 | Young islander (`Kid2` in the scene). |
 | `Knight` | Record guardian 3 | `Gate_Guardian` in the scene. |
-
-The scene currently uses `Record Guardian 1/2/3` for the guardians. The names
-above replace them in Phase B.
 
 ## Voices
 
@@ -69,8 +58,7 @@ above replace them in Phase B.
   lines play only after a real rhythm success.
 - Stars never change the hint and never unlock access.
 - The Knight is guardian 3. He guards the record, not the gate, and says so.
-- Guardian order and access rules belong to the progression integration. Until
-  it exists, the guardians keep an honest "not connected" message.
+- The Islander requires `beach_1`. The Knight requires `beach_2`.
 
 ### Landmark reference
 
@@ -105,8 +93,7 @@ formation.
 | 11 | Old Spin | Northwest, past the stumps, where the trees meet the sand. |
 | 12 | Old Spin | He may have kept a copy. Ask about the tide and the rhythm. |
 
-This conversation doubles as the re-readable first hint. Phase A has no variant
-selector, so repeating the interaction replays these lines.
+Subsequent interactions use the repeat hint until another record is collected.
 
 ### Repeat hint 1 (0 records, introduction already seen)
 
@@ -299,10 +286,9 @@ Same lines 1-5, with the last line replaced:
 | 1 | The earlier records must be found before mine. |
 | 2 | I keep the order, not the gate. |
 
-## Current scene text (outdated)
+## Previous scene text (historical)
 
-The scene still holds the original placeholders. They are listed here so the
-Phase B diff is easy to review.
+Phase B replaced these placeholders.
 
 | NPC | Speaker in scene | Lines |
 | --- | --- | --- |
@@ -337,9 +323,6 @@ Intentional deviations from the GDD and from a literal reading of the task:
 - **Trade is composition help.** The GDD says the protagonist recovers the
   records in exchange for the musician's guidance. The script states the trade
   as help composing the protagonist's own album, which keeps the same exchange.
-- **No scene edits yet.** This document is the draft. The four
-  `DialogueInteractable` components still hold the old placeholders; Phase B
-  applies the text together with the progression state.
 
 Landmark and route checks were done against the scene tilemaps: all four NPCs
 are reachable from the player spawn on the `Collision` grid, and the three
@@ -348,15 +331,7 @@ pending.
 
 ## Phase B checklist
 
-Text is already written. Wiring needs:
-
-1. Progression state: records collected, last rhythm result, gate state.
-2. A variant source for `DialogueInteractable` (lightweight selector or
-   external provider). Do not rewrite `DialogueInteractable` or `DialogueUI`
-   beyond adding that selector.
-3. Apply the speaker names and the line arrays to the four scene components.
-4. Verify in Play Mode: line wrapping, movement lock and restore, repeat,
-   failure and retry, success only after a real rhythm win, three records,
-   completion, and gate-open variant.
-5. Confirm stars do not change hints or access.
-6. Announce the `Beach.unity` edit to Aitor before merging.
+- Check line wrapping and movement lock when dialogue opens and closes.
+- Check repeat hints, sequence locks, failure and retry, first success, replay,
+  and Old Spin's three-record completion.
+- Connect and verify the gate-open variant when the next area transition lands.
