@@ -19,6 +19,8 @@ namespace VinylShores.Rhythm
         [SerializeField] private RectTransform[] starRoots;
         [SerializeField] private RectTransform[] fillMasks;
         private UnityEngine.UI.Button returnButton;
+        private UnityEngine.UI.Button resumeButton;
+        private UnityEngine.UI.Button pauseExitButton;
         private bool animating;
         private double startedDsp;
         private int points;
@@ -41,6 +43,8 @@ namespace VinylShores.Rhythm
         {
             animating = false;
             if (returnButton != null) returnButton.gameObject.SetActive(false);
+            if (resumeButton != null) resumeButton.gameObject.SetActive(false);
+            if (pauseExitButton != null) pauseExitButton.gameObject.SetActive(false);
             EarnedStars = 0;
             if (!IsConfigured) return;
             details.SetActive(false);
@@ -57,6 +61,51 @@ namespace VinylShores.Rhythm
             restartButton.anchoredPosition = new Vector2(0, -105);
             for (int i = 0; i < 3; i++) SetStar(i, 0);
             score.text = "";
+        }
+
+        public void ShowPause(Action resume, Action exit)
+        {
+            if (resumeButton == null)
+                resumeButton = CreateButton("ResumeButton", resume);
+            if (exit != null && pauseExitButton == null)
+                pauseExitButton = CreateButton("PauseReturnToBeachButton", exit);
+
+            card.sizeDelta = new Vector2(460, exit != null ? 330 : 270);
+            title.sizeDelta = new Vector2(420, 60);
+            title.anchoredPosition = new Vector2(0, exit != null ? 112 : 82);
+            var heading = title.GetComponent<TMP_Text>();
+            heading.text = "Paused";
+            heading.fontSize = 52;
+            message.gameObject.SetActive(false);
+
+            float firstRow = exit != null ? 40 : 10;
+            LayoutPauseButton(resumeButton, "Resume", firstRow);
+            LayoutPauseButton(restartButton.GetComponent<UnityEngine.UI.Button>(), "Restart", firstRow - 68);
+            if (exit != null) LayoutPauseButton(pauseExitButton, "Return to beach", firstRow - 136);
+        }
+
+        public void SelectResumeButton() => resumeButton.Select();
+
+        private static void LayoutPauseButton(UnityEngine.UI.Button button, string label, float y)
+        {
+            var rect = (RectTransform)button.transform;
+            rect.sizeDelta = new Vector2(330, 54);
+            rect.anchoredPosition = new Vector2(0, y);
+            var text = button.GetComponentInChildren<TMP_Text>(true);
+            text.text = label;
+            text.fontSize = 32;
+            button.interactable = true;
+            button.gameObject.SetActive(true);
+        }
+
+        private UnityEngine.UI.Button CreateButton(string objectName, Action action)
+        {
+            var copy = Instantiate(restartButton.gameObject, restartButton.parent);
+            copy.name = objectName;
+            var button = copy.GetComponent<UnityEngine.UI.Button>();
+            button.onClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+            button.onClick.AddListener(() => action());
+            return button;
         }
 
         public void Show(RhythmScoreSession session)
@@ -94,13 +143,7 @@ namespace VinylShores.Rhythm
         {
             if (!BeachRhythmSession.IsActive || restartButton == null) return;
             if (returnButton == null)
-            {
-                var copy = Instantiate(restartButton.gameObject, restartButton.parent);
-                copy.name = "ReturnToBeachButton";
-                returnButton = copy.GetComponent<UnityEngine.UI.Button>();
-                returnButton.onClick.RemoveAllListeners();
-                returnButton.onClick.AddListener(BeachRhythmSession.ReturnToBeach);
-            }
+                returnButton = CreateButton("ReturnToBeachButton", BeachRhythmSession.ReturnToBeach);
             var rect = (RectTransform)returnButton.transform;
             rect.sizeDelta = resultLayout ? new Vector2(470, 58) : new Vector2(240, 54);
             rect.anchoredPosition = resultLayout ? new Vector2(-255, -218) : new Vector2(-140, -105);

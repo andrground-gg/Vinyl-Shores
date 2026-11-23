@@ -5,6 +5,11 @@ using VinylShores.Core;
 
 namespace VinylShores.Dialogue
 {
+    public interface IDialogueSource
+    {
+        DialogueLine[] GetLines(out bool notifyFinished);
+    }
+
     /// <summary>
     /// Repeatable, distance-based NPC interaction. Pressing Interact opens the
     /// dialogue when the player is close enough, advances it while open, and
@@ -34,9 +39,12 @@ namespace VinylShores.Dialogue
         private DialogueUI subscribedUI;
         private int nextReferenceResolveFrame;
         private bool dialogueOwner;
+        private bool notifyWhenClosed;
+        private IDialogueSource source;
 
         private void Awake()
         {
+            source = GetComponent<IDialogueSource>();
             ResolveSceneReferences();
             CacheMovementLock();
         }
@@ -95,6 +103,7 @@ namespace VinylShores.Dialogue
 
             bool wasDialogueOwner = dialogueOwner;
             dialogueOwner = false;
+            notifyWhenClosed = false;
 
             if (wasDialogueOwner && ui != null && ui.IsOpen)
             {
@@ -171,13 +180,20 @@ namespace VinylShores.Dialogue
                 return;
             }
 
-            if (lines == null || lines.Length == 0)
+            bool notifyFinished = true;
+            DialogueLine[] selectedLines = source != null ? source.GetLines(out notifyFinished) : lines;
+            if (TryOpen(selectedLines, notifyFinished))
+                lastHandledFrame = Time.frameCount;
+        }
+
+        public bool TryOpen(DialogueLine[] selectedLines, bool notifyFinished)
+        {
+            if (!isActiveAndEnabled || ui == null || player == null || ui.IsOpen) return false;
+            if (selectedLines == null || selectedLines.Length == 0)
             {
                 Debug.LogWarning("DialogueInteractable has no dialogue lines.", this);
-                return;
+                return false;
             }
-
-            lastHandledFrame = Time.frameCount;
 
             CacheMovementLock();
             if (movementLock == null)
@@ -190,15 +206,19 @@ namespace VinylShores.Dialogue
             SetMovementLocked(true);
 
             dialogueOwner = true;
+            notifyWhenClosed = notifyFinished;
             ui.SetPromptRequest(this, false);
-            ui.Open(lines);
+            ui.Open(selectedLines);
 
             if (!ui.IsOpen)
             {
                 // Open failed (for example, an empty array supplied at runtime).
                 dialogueOwner = false;
+                notifyWhenClosed = false;
                 SetMovementLocked(false);
             }
+
+            return ui.IsOpen;
         }
 
         private void HandleDialogueClosed()
@@ -209,9 +229,11 @@ namespace VinylShores.Dialogue
             }
 
             dialogueOwner = false;
+            bool notify = notifyWhenClosed;
+            notifyWhenClosed = false;
             SetMovementLocked(false);
 
-            if (onDialogueFinished != null)
+            if (notify && onDialogueFinished != null)
             {
                 onDialogueFinished.Invoke();
             }
