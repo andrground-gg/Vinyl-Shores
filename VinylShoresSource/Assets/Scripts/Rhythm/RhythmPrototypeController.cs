@@ -49,6 +49,7 @@ namespace VinylShores.Rhythm
         private double musicStartDsp;
         private double loadStartedDsp;
         private bool configured;
+        private bool previousListenerPause;
         private const int CountInBeats = 4;
         private const double PreparationSeconds = 0.2;
         private const string CalibrationPreference = "VinylShores.RhythmPrototype.VisualDelayMs";
@@ -67,6 +68,8 @@ namespace VinylShores.Rhythm
         public RhythmChart Chart => chart;
 
         public RhythmPlaybackState State { get; private set; } = RhythmPlaybackState.Ready;
+        public bool IsPaused { get; private set; }
+        private bool IsPlayingAttempt => State == RhythmPlaybackState.CountIn || State == RhythmPlaybackState.Playing;
         public double SecondsPerBeat => chart != null ? chart.SecondsPerBeat : 0;
         public int TotalNotes => chart != null ? chart.NoteCount : 0;
         public double SongTime => State == RhythmPlaybackState.Finished ? DurationSeconds :
@@ -140,8 +143,10 @@ namespace VinylShores.Rhythm
         public void BeginPlayback()
         {
             if (!configured || !isActiveAndEnabled || State == RhythmPlaybackState.Loading ||
-                State == RhythmPlaybackState.CountIn || State == RhythmPlaybackState.Playing) return;
+                (IsPlayingAttempt && !IsPaused)) return;
+            // Cancel the old scheduled audio before releasing the DSP clock on restart.
             StopPlayback();
+            ResumePlayback();
             if (!PrepareSong()) return;
             State = RhythmPlaybackState.Loading;
             readyPanel.SetActive(false);
@@ -225,6 +230,13 @@ namespace VinylShores.Rhythm
         {
             if (!configured) return;
             var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && IsPlayingAttempt)
+            {
+                if (IsPaused) ResumePlayback();
+                else PausePlayback();
+                return;
+            }
+            if (IsPaused) return;
             if (keyboard != null)
             {
                 if (keyboard.spaceKey.wasPressedThisFrame) BeginPlayback();
@@ -282,7 +294,7 @@ namespace VinylShores.Rhythm
 
         private void JudgeInput(int lane, double inputEventTime)
         {
-            if (!configured || (State != RhythmPlaybackState.CountIn && State != RhythmPlaybackState.Playing)) return;
+            if (!configured || IsPaused || !IsPlayingAttempt) return;
             lanes[lane].Press();
             // Input events carry timestamps; subtract their age instead of judging at this frame's arrival time.
             double eventDspTime = AudioSettings.dspTime - (InputState.currentTime - inputEventTime);
@@ -298,6 +310,34 @@ namespace VinylShores.Rhythm
             lanes[result.Lane].ShowJudgement(result, color);
             comboView.SetCombo(Scoring.Combo);
             stageView.Judge(result, Scoring.Combo);
+        }
+
+        private void PausePlayback()
+        {
+            previousListenerPause = AudioListener.pause;
+            // The listener also freezes DSP time, keeping scheduled counts, notes and music in sync.
+            AudioListener.pause = true;
+            IsPaused = true;
+            resultView.ShowPause(ResumePlayback, BeachRhythmSession.IsActive ? ExitPausedChallenge : null);
+            readyPanel.SetActive(true);
+            resultView.SelectResumeButton();
+        }
+
+        private void ResumePlayback()
+        {
+            if (!IsPaused) return;
+            readyPanel.SetActive(false);
+            resultView.ResetView();
+            IsPaused = false;
+            AudioListener.pause = previousListenerPause;
+        }
+
+        private void ExitPausedChallenge()
+        {
+            if (!IsPaused || !BeachRhythmSession.IsActive) return;
+            // No result is submitted for the interrupted attempt. Completed retries still count.
+            enabled = false;
+            BeachRhythmSession.ReturnToBeach();
         }
 
         public void SetVisualDelay(float milliseconds)
@@ -364,6 +404,7 @@ namespace VinylShores.Rhythm
             leftAction?.Disable();
             rightAction?.Disable();
             StopPlayback();
+            ResumePlayback();
             if (stageView != null) stageView.ResetView();
             if (comboView != null) comboView.ResetView();
             if (resultView != null) resultView.ResetView();
