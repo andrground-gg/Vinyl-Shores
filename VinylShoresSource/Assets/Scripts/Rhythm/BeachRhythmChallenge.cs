@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using VinylShores.Audio;
 using VinylShores.Dialogue;
 using VinylShores.Progress;
 
@@ -168,7 +169,11 @@ namespace VinylShores.Rhythm
             for (int i = 0; i < roots.Length; i++)
             {
                 wasActive[i] = roots[i].activeSelf;
-                if (wasActive[i]) roots[i].SetActive(false);
+                if (!wasActive[i]) continue;
+                // Deactivating a GameObject can discard its AudioSource playback position.
+                foreach (var audio in roots[i].GetComponentsInChildren<BeachAudio>())
+                    if (audio.isActiveAndEnabled) audio.Suspend();
+                roots[i].SetActive(false);
             }
             AsyncOperation load = SceneManager.LoadSceneAsync(RhythmScenePath, LoadSceneMode.Additive);
             if (load == null)
