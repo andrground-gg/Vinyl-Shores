@@ -44,6 +44,7 @@ namespace VinylShores.Audio
         private AudioSource activeMusic;
         private AudioSource ambienceSource;
         private AudioSource sfxSource;
+        private double introLoopStartDsp = double.NegativeInfinity;
 
         private Coroutine musicFade;
         private Coroutine ambienceFade;
@@ -83,21 +84,25 @@ namespace VinylShores.Audio
         /// </summary>
         public void PlayMusic(AudioClip clip, float fadeSeconds = -1f, bool loop = true)
         {
-            if (clip == null || (activeMusic.clip == clip && activeMusic.isPlaying))
+            // Before the loop starts, the intro is still the audible source.
+            AudioSource outgoing = AudioSettings.dspTime < introLoopStartDsp ? musicA : activeMusic;
+            if (clip == null || (outgoing.clip == clip && outgoing.isPlaying))
             {
                 return;
             }
 
             float fade = fadeSeconds < 0f ? defaultMusicFade : fadeSeconds;
-            AudioSource next = activeMusic == musicA ? musicB : musicA;
+            AudioSource next = outgoing == musicA ? musicB : musicA;
 
             StopRunning(ref musicFade);
+            next.Stop(); // Cancel a loop that was queued after the intro.
+            introLoopStartDsp = double.NegativeInfinity;
             next.clip = clip;
             next.loop = loop;
             next.volume = 0f;
             next.Play();
 
-            musicFade = StartCoroutine(Crossfade(activeMusic, next, fade));
+            musicFade = StartCoroutine(Crossfade(outgoing, next, fade));
             activeMusic = next;
         }
 
@@ -129,7 +134,8 @@ namespace VinylShores.Audio
             musicB.clip = loopClip;
             musicB.loop = true;
             musicB.volume = 1f;
-            musicB.PlayScheduled(startDsp + loopStartSeconds);
+            introLoopStartDsp = startDsp + loopStartSeconds;
+            musicB.PlayScheduled(introLoopStartDsp);
 
             // The loop is the music that stays, so later crossfades start from it.
             activeMusic = musicB;
