@@ -14,6 +14,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Prototypes/RhythmPrototype.unity
     guid: 55c6850429bb4d243b7c7772f4760424
+  - enabled: 1
+    path: Assets/Scenes/Forest_Level/Shack.unity
+    guid: 4b33546747d16124d8911aad9c80301e
+  - enabled: 1
+    path: Assets/Scenes/Forest_Level/Forest.unity
+    guid: db33a4a30328fc64a9d4f5095bb05ae9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
